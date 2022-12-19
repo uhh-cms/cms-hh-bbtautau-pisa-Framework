@@ -27,26 +27,28 @@ def create_crab_configs(samples_cfg, output_dir):
   for sample_type, sample_dict in outputs.items():
     mc_data = 'data' if sample_type == 'data' else 'mc'
     store_failed = sample_type != 'data'
-    config = {
-      'config': {
-        'params': {
-          'sampleType': mc_data,
-          'era': era,
-          'storeFailed': store_failed,
+    for name, desc in sample_dict.items():
+      config = {
+        'config': {
+          'params': {
+            'sampleType': mc_data,
+            'era': era,
+            'storeFailed': store_failed,
+          }
         }
       }
-    }
-    data = { }
-    for name, desc in sample_dict.items():
+
+      data = {}
       if len(desc['ignoreFiles']) == 0:
         data[name] = desc['inputDataset']
       else:
         data[name] = desc
 
-    with open(os.path.join(output_dir, sample_type + '.yaml'), 'w') as f:
-      yaml.safe_dump(config, f)
-      f.write('\n')
-      yaml.safe_dump(data, f)
+      with open(os.path.join(output_dir, name + '.yaml'), 'w') as f:
+        yaml.safe_dump(config, f)
+        f.write('\n')
+        yaml.safe_dump(data, f)
+
   with open(os.path.join(output_dir, "all_samples.txt"), 'w') as f:
     for sample in sorted(all_samples):
       f.write(sample + '\n')
