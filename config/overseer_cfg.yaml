@@ -26,8 +26,9 @@ filesToTransfer:
   - Common/TextIO.h
 
 # Update destination site and paths before launching a production
-#site: T3_CH_CERNBOX
-#crabOutput: /store/user/kandroso/bbtt-prod
+site: T2_DE_DESY
+crabOutput: /store/user/mrieger/crab_nano_v11
+# TODO: update local and final output paths
 #localCrabOutput: /eos/home-k/kandroso/bbtt-prod
 #finalOutput: /eos/home-p/kandroso/bbtt/nanoV10
 

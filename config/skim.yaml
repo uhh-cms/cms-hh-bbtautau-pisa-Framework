@@ -119,16 +119,16 @@ column_filters:
   - drop ^.*_p4$
   - drop ^.*_B[01](T|)$
 
-column_filters_for_failed:
-  - drop ^.*$
-  - keep ^LHE_.*$
-  - keep genWeight
-  - keep ^Pileup_(nPU|nTrueInt)$
+# column_filters_for_failed:
+#   - drop ^.*$
+#   - keep ^LHE_.*$
+#   - keep genWeight
+#   - keep ^Pileup_(nPU|nTrueInt)$
 
-processing_module:
-  file: NanoProd/skimNano.py
-  function: skim_RecoLeptons
+# processing_module:
+#   file: NanoProd/skimNano.py
+#   function: skim_RecoLeptons
 
-processing_module_for_failed:
-  file: NanoProd/skimNano.py
-  function: skim_failed_RecoLeptons
+# processing_module_for_failed:
+#   file: NanoProd/skimNano.py
+#   function: skim_failed_RecoLeptons
