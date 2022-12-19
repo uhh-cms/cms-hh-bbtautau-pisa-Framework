@@ -28,9 +28,8 @@ filesToTransfer:
 # Update destination site and paths before launching a production
 site: T2_DE_DESY
 crabOutput: /store/user/mrieger/crab_nano_v11
-# TODO: update local and final output paths
-#localCrabOutput: /eos/home-k/kandroso/bbtt-prod
-#finalOutput: /eos/home-p/kandroso/bbtt/nanoV10
+localCrabOutput: /eos/home-m/mrieger/nano_v11/crab_output
+finalOutput: /eos/home-m/mrieger/nano_v11
 
 maxMemory: 2500
 numCores: 1
