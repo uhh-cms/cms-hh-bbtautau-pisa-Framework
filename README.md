@@ -2,7 +2,7 @@
 
 ## How to install
 ```sh
-git clone --recursive git@github.com:cms-hh-bbtautau/Framework.git
+git clone --recursive git@github.com:uhh-cms/cms-hh-bbtautau-pisa-Framework.git
 ```
 
 ## Loading environment
