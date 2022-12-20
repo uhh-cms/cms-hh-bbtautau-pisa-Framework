@@ -1,8 +1,11 @@
 # HH -> bbtautau Framework
 
 ## How to install
+
+**Please note the name at the end of the clone command!**
+
 ```sh
-git clone --recursive git@github.com:uhh-cms/cms-hh-bbtautau-pisa-Framework.git
+git clone --recursive git@github.com:uhh-cms/cms-hh-bbtautau-pisa-Framework.git Framework
 ```
 
 ## Loading environment
