@@ -14,16 +14,16 @@ filesToTransfer:
   - RunKit/skim_tree.py
   - RunKit/sh_tools.py
   - config/skim.yaml
-  - NanoProd/skimNano.py
-  - Common/BaselineSelection.py
-  - Common/AnalysisTools.h
-  - Common/BaselineGenSelection.h
-  - Common/BaselineRecoSelection.h
-  - Common/exception.h
-  - Common/GenStatusFlags.h
-  - Common/GenTools.h
-  - Common/HHCore.h
-  - Common/TextIO.h
+  # - NanoProd/skimNano.py
+  # - Common/BaselineSelection.py
+  # - Common/AnalysisTools.h
+  # - Common/BaselineGenSelection.h
+  # - Common/BaselineRecoSelection.h
+  # - Common/exception.h
+  # - Common/GenStatusFlags.h
+  # - Common/GenTools.h
+  # - Common/HHCore.h
+  # - Common/TextIO.h
 
 # Update destination site and paths before launching a production
 site: T2_DE_DESY

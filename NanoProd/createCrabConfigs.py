@@ -1,7 +1,7 @@
 import os
 import yaml
 
-def create_crab_configs(samples_cfg, output_dir):
+def create_crab_configs(samples_cfg, output_dir, store_failed=None):
   os.makedirs(output_dir, exist_ok=True)
   with open(samples_cfg, 'r') as f:
     samples = yaml.safe_load(f)
@@ -26,14 +26,14 @@ def create_crab_configs(samples_cfg, output_dir):
       raise
   for sample_type, sample_dict in outputs.items():
     mc_data = 'data' if sample_type == 'data' else 'mc'
-    store_failed = sample_type != 'data'
+    _store_failed = (sample_type != 'data') if store_failed is None else store_failed
     for name, desc in sample_dict.items():
       config = {
         'config': {
           'params': {
             'sampleType': mc_data,
             'era': era,
-            'storeFailed': store_failed,
+            'storeFailed': _store_failed,
           }
         }
       }
@@ -58,7 +58,8 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Create configs that will be used to submit crab jobs.')
   parser.add_argument('--samples', required=True, type=str, help="yaml file with sample list")
   parser.add_argument('--output', required=True, type=str, help="output path where crab configs will be stored")
+  parser.add_argument('--store-failed', action="store_true", help="store events that failed the selection")
   args = parser.parse_args()
 
-  create_crab_configs(args.samples, args.output)
+  create_crab_configs(args.samples, args.output, store_failed=args.store_failed)
 
