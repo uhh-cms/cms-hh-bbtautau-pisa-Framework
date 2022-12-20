@@ -89,19 +89,19 @@ column_filters:
   - drop boostedTau_photonsOutsideSignalCone
   - drop boostedTau_rawAntiEleCat2018
 
-  - drop ^(n|)SV(_.*|)$
-  - drop ^(n|)OtherPV(_.*|)$
-  - drop ^(n|)Photon(_.*|)$
-  - drop ^(n|)LowPtElectron(_.*|)$
-  - drop ^(n|)SoftActivityJet(.*|)$
-  - drop ^(n|)IsoTrack(_.*|)$
+  - drop ^SV(_.*|)$
+  - drop ^OtherPV(_.*|)$
+  - drop ^Photon(_.*|)$
+  - drop ^LowPtElectron(_.*|)$
+  - drop ^SoftActivityJet(.*|)$
+  - drop ^IsoTrack(_.*|)$
   - drop ^HTXS_.*$
-  - drop ^(n|)FsrPhoton(_.*|)$
-  - drop ^(n|)GenDressedLepton(_.*|)$
-  - drop ^(n|)GenIsolatedPhoton(_.*|)$
-  - drop ^(n|)GenProton(_.*|)$
-  - drop ^(n|)Proton(_.*|)$
-  - drop ^(n|)PPSLocalTrack(_.*|)$
+  - drop ^FsrPhoton(_.*|)$
+  - drop ^GenDressedLepton(_.*|)$
+  - drop ^GenIsolatedPhoton(_.*|)$
+  - drop ^GenProton(_.*|)$
+  - drop ^Proton(_.*|)$
+  - drop ^PPSLocalTrack(_.*|)$
 
   - drop ^L1_.*$
 
