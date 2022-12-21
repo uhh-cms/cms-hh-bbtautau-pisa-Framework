@@ -74,7 +74,7 @@ def customise_pnet(process):
     """
     process = customise(process)
 
-    addAK8 = False
+    addAK8 = True
 
     pnetDiscriminatorsAK4 = []
 
