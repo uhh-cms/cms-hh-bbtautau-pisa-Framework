@@ -40,14 +40,17 @@ def customise(process):
     # "+keep+ abs(pdgId) == 6 || abs(pdgId) == 23 || abs(pdgId) == 24 || abs(pdgId) == 25 || abs(pdgId) == 35 || abs(pdgId) == 39  || abs(pdgId) == 9990012 || abs(pdgId) == 9900012",   # keep VIP particles
     # "drop abs(pdgId)= 2212 && abs(pz) > 1000", #drop LHC protons accidentally added by previous keeps
 
-    # taken from https://github.com/cms-sw/cmssw/blob/9318eb0ff5982d62e93f385ffbe72e04887c93c8/PhysicsTools/NanoAOD/python/genparticles_cff.py
+    # taken from https://github.com/cms-sw/cmssw/blob/a6f90885ddad4a01df9568177567b8542a9d5fea/PhysicsTools/NanoAOD/python/genparticles_cff.py
+    # changes:
+    #   - bug fix in the "drop LHC protons" line
+    #   - reduce pt threshold for tau decay chains from 15 to 10 GeV
     "drop *",
-    "keep++ abs(pdgId) == 15 & (pt > 15 ||  isPromptDecayed() )",#  keep full tau decay chain for some taus
+    "keep++ abs(pdgId) == 15 & (pt > 10 ||  isPromptDecayed() )",#  keep full tau decay chain for some taus
     #"drop status==1 & pt < 1", #drop soft stable particle in tau decay
     "keep+ abs(pdgId) == 15 ",  #  keep first gen decay product for all tau
     "+keep pdgId == 22 && status == 1 && (pt > 10 || isPromptFinalState())", # keep gamma above 10 GeV (or all prompt) and its first parent
     "+keep abs(pdgId) == 11 || abs(pdgId) == 13 || abs(pdgId) == 15", #keep leptons, with at most one mother back in the history
-    "drop abs(pdgId)= 2212 && abs(pz) > 1000", #drop LHC protons accidentally added by previous keeps
+    "drop abs(pdgId) == 2212 && abs(pz) > 1000", #drop LHC protons accidentally added by previous keeps
     "keep (400 < abs(pdgId) < 600) || (4000 < abs(pdgId) < 6000)", #keep all B and C hadrons
     "keep abs(pdgId) == 12 || abs(pdgId) == 14 || abs(pdgId) == 16",   # keep neutrinos
     "keep status == 3 || (status > 20 && status < 30)", #keep matrix element summary
@@ -61,10 +64,17 @@ def customise(process):
   # process = nanoAOD_addDeepInfoAK4CHS(process, False, False, True)
   # process = AddParticleNetAK4Scores(process, 'jetTable')
 
+  # from https://github.com/cms-hnl/HNLTauPrompt/blob/8d8ab4c0bd5550f57b68b01c3f6e8b630a032fbf/NanoProd/customiseNano.py#L4-L25
+  for coord in [ 'x', 'y', 'z' ]:
+    setattr(process.genParticleTable.variables, 'v' + coord,
+            Var(f'vertex().{coord}', float, precision=10,
+                doc=f'{coord} coordinate of the gen particle production vertex'))
+
   process.boostedTauTable.variables.dxy = Var("leadChargedHadrCand().dxy()", float,
     doc="d_{xy} of lead track with respect to PV, in cm (with sign)", precision=10)
   process.boostedTauTable.variables.dz = Var("leadChargedHadrCand().dz()", float,
     doc="d_{z} of lead track with respect to PV, in cm (with sign)", precision=14)
+
   return process
 
 
@@ -101,11 +111,11 @@ def customise_pnet(process):
     )
 
     from RecoBTag.ONNXRuntime.boostedJetONNXJetTagsProducer_cfi import boostedJetONNXJetTagsProducer
-    process.pfParticleNetAK4LastJetTags = boostedJetONNXJetTagsProducer.clone();
-    process.pfParticleNetAK4LastJetTags.src = cms.InputTag("pfParticleNetAK4LastJetTagInfos");
-    process.pfParticleNetAK4LastJetTags.flav_names = cms.vstring('probmu','probele','probtaup1h0p','probtaup1h1p','probtaup1h2p','probtaup3h0p','probtaup3h1p','probtaum1h0p','probtaum1h1p','probtaum1h2p','probtaum3h0p','probtaum3h1p','probb','probc','probuds','probg','ptcorr','ptreshigh','ptreslow');
-    process.pfParticleNetAK4LastJetTags.preprocess_json = cms.string('RecoBTag/Combined/data/ParticleNetAK4/CHS/PNETUL/ClassRegQuantileNoJECLost/preprocess.json');
-    process.pfParticleNetAK4LastJetTags.model_path = cms.FileInPath('RecoBTag/Combined/data/ParticleNetAK4/CHS/PNETUL/ClassRegQuantileNoJECLost/particle-net.onnx');
+    process.pfParticleNetAK4LastJetTags = boostedJetONNXJetTagsProducer.clone()
+    process.pfParticleNetAK4LastJetTags.src = cms.InputTag("pfParticleNetAK4LastJetTagInfos")
+    process.pfParticleNetAK4LastJetTags.flav_names = cms.vstring('probmu','probele','probtaup1h0p','probtaup1h1p','probtaup1h2p','probtaup3h0p','probtaup3h1p','probtaum1h0p','probtaum1h1p','probtaum1h2p','probtaum3h0p','probtaum3h1p','probb','probc','probuds','probg','ptcorr','ptreshigh','ptreslow')
+    process.pfParticleNetAK4LastJetTags.preprocess_json = cms.string('Framework/NanoProd/data/ParticleNetAK4/CHS/PNETUL/ClassRegQuantileNoJECLost/preprocess.json')
+    process.pfParticleNetAK4LastJetTags.model_path = cms.FileInPath('Framework/NanoProd/data/ParticleNetAK4/CHS/PNETUL/ClassRegQuantileNoJECLost/particle-net.onnx')
     process.pfParticleNetAK4LastJetTags.debugMode = cms.untracked.bool(False)
 
     pnetDiscriminatorsAK4.extend([
@@ -146,7 +156,7 @@ def customise_pnet(process):
         algos = cms.VPSet(_chsalgos_106X_UL18),
     )
 
-    process.slimmedJetsUpdatedPNET.userData.userInts.src += ['pileupJetIdUpdatedPNET:fullId'];
+    process.slimmedJetsUpdatedPNET.userData.userInts.src += ['pileupJetIdUpdatedPNET:fullId']
 
     from PhysicsTools.NanoAOD.common_cff import Var
     process.finalJets.src = cms.InputTag("slimmedJetsUpdatedPNET")
@@ -196,11 +206,11 @@ def customise_pnet(process):
           min_puppi_wgt = cms.double(-1),
       )
 
-      process.pfParticleNetAK8LastJetTags = boostedJetONNXJetTagsProducer.clone();
-      process.pfParticleNetAK8LastJetTags.src = cms.InputTag("pfParticleNetAK8LastJetTagInfos");
-      process.pfParticleNetAK8LastJetTags.flav_names = cms.vstring('probHtt','probHtm','probHte','probHbb','probHcc','probHqq','probHgg','probQCD2hf','probQCD1hf','probQCD0hf','masscorr');
-      process.pfParticleNetAK8LastJetTags.preprocess_json = cms.string('RecoBTag/Combined/data/ParticleNetAK8/Puppi/PNETUL/ClassReg/preprocess.json');
-      process.pfParticleNetAK8LastJetTags.model_path = cms.FileInPath('RecoBTag/Combined/data/ParticleNetAK8/Puppi/PNETUL/ClassReg/particle-net.onnx');
+      process.pfParticleNetAK8LastJetTags = boostedJetONNXJetTagsProducer.clone()
+      process.pfParticleNetAK8LastJetTags.src = cms.InputTag("pfParticleNetAK8LastJetTagInfos")
+      process.pfParticleNetAK8LastJetTags.flav_names = cms.vstring('probHtt','probHtm','probHte','probHbb','probHcc','probHqq','probHgg','probQCD2hf','probQCD1hf','probQCD0hf','masscorr')
+      process.pfParticleNetAK8LastJetTags.preprocess_json = cms.string('Framework/NanoProd/data/ParticleNetAK8/Puppi/PNETUL/ClassReg/preprocess.json')
+      process.pfParticleNetAK8LastJetTags.model_path = cms.FileInPath('Framework/NanoProd/data/ParticleNetAK8/Puppi/PNETUL/ClassReg/particle-net.onnx')
 
       pnetDiscriminatorsAK8.extend([
           "pfParticleNetAK8LastJetTags:probHtt",
@@ -240,8 +250,8 @@ def customise_pnet(process):
 
       process.pfParticleNetMassRegressionJetTags = boostedJetONNXJetTagsProducer.clone(
           src = 'pfParticleNetAK8JetTagInfos',
-          preprocess_json = 'RecoBTag/Combined/data/ParticleNetAK8/MassRegression/V01/preprocess.json',
-          model_path = 'RecoBTag/Combined/data/ParticleNetAK8/MassRegression/V01/particle-net.onnx',
+          preprocess_json = 'Framework/NanoProd/data/ParticleNetAK8/MassRegression/V01/preprocess.json',
+          model_path = 'Framework/NanoProd/data/ParticleNetAK8/MassRegression/V01/particle-net.onnx',
           flav_names = ["mass"]
       )
 
