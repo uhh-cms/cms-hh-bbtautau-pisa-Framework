@@ -31,19 +31,24 @@ crabOutput: /store/user/mrieger/crab_nano_v11
 localCrabOutput: /eos/home-m/mrieger/nano_v11/crab_output
 finalOutput: /eos/home-m/mrieger/nano_v11
 
+# crab configs
+# ignoreLocality: True
+# whitelist:
+#   - T2_DE_DESY
+
 maxMemory: 2500
 numCores: 1
 inputDBS: global
 allowNonValid: False
 dryrun: False
-maxResubmitCount: 2
+maxResubmitCount: 3
 maxRecoveryCount: 2
 updateInterval: 60 # minutes
-postProcessing:
-  lawTask: CrabNanoProdTaskPostProcess
-  workflow: htcondor
-  bootstrap: bootstrap.sh
-postProcessingDoneFlag: post_processing_done.txt
+# postProcessing:
+#   lawTask: CrabNanoProdTaskPostProcess
+#   workflow: htcondor
+#   bootstrap: bootstrap.sh
+# postProcessingDoneFlag: post_processing_done.txt
 #  requirements: ( (OpSysAndVer =?= "CentOS7") || (OpSysAndVer =?= "CentOS8") )
 targetOutputFileSize: 2048 # MiB
 renewKerberosTicket: True
