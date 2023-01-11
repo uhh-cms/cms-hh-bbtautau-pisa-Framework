@@ -27,9 +27,9 @@ filesToTransfer:
 
 # Update destination site and paths before launching a production
 site: T2_DE_DESY
-crabOutput: /store/user/mrieger/crab_nano_v11
-localCrabOutput: /eos/home-m/mrieger/nano_v11/crab_output
-finalOutput: /eos/home-m/mrieger/nano_v11
+crabOutput: /store/user/pkeicher/crab_nano_v11_v2
+localCrabOutput: /eos/home-p/pkeicher/nano_v11_v2/crab_output
+finalOutput: /eos/home-p/pkeicher/nano_v11_v2
 
 maxMemory: 2500
 numCores: 1
@@ -47,6 +47,14 @@ postProcessingDoneFlag: post_processing_done.txt
 #  requirements: ( (OpSysAndVer =?= "CentOS7") || (OpSysAndVer =?= "CentOS8") )
 targetOutputFileSize: 2048 # MiB
 renewKerberosTicket: True
+blacklist:
+  - T2_US_Wisconsin
+  - T2_US_Purdue
+  - T2_BR_SPRACE
+  - T2_US_Nebraska
+  - T2_US_MIT
+  - T1_US_FNAL
+  - T2_KR_KISTI
 whitelistFinalRecovery:
   - T1_DE_KIT
   - T2_CH_CERN
