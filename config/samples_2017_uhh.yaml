@@ -1,5 +1,6 @@
 GLOBAL:
   era: Run2_2017
+  nanoVersion: v11
   remoteBases:
     bogdan_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/bwieders/crab_nano_v11_v2
     philip_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/pkeicher/crab_nano_v11_v2
