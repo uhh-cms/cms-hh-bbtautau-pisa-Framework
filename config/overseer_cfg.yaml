@@ -52,14 +52,14 @@ updateInterval: 60 # minutes
 #  requirements: ( (OpSysAndVer =?= "CentOS7") || (OpSysAndVer =?= "CentOS8") )
 targetOutputFileSize: 2048 # MiB
 renewKerberosTicket: True
-blacklist:
-  - T2_US_Wisconsin
-  - T2_US_Purdue
-  - T2_BR_SPRACE
-  - T2_US_Nebraska
-  - T2_US_MIT
-  - T1_US_FNAL
-  - T2_KR_KISTI
+# blacklist:
+#   - T2_US_Wisconsin
+#   - T2_US_Purdue
+#   - T2_BR_SPRACE
+#   - T2_US_Nebraska
+#   - T2_US_MIT
+#   - T1_US_FNAL
+#   - T2_KR_KISTI
 whitelistFinalRecovery:
   - T1_DE_KIT
   - T2_CH_CERN
