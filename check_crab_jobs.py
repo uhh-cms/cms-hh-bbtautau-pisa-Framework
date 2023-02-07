@@ -1,20 +1,69 @@
 import os
 import sys
 import json
+import yaml
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from tqdm import tqdm
 from itertools import chain
 from collections.abc import Iterable
+import numpy as np
+
+try:
+    import gfal2
+except ImportError as e:
+    print("WARNING: could not import gfal2")
+    print(e)
+    print("gfal will be disabled!")
+    gfal2 = None
+
+wlcg_template= os.path.join("{wlcg_prefix}{wlcg_dir}",
+    "{sample_name}",
+    "{crab_dirname}",
+    "{time_stamp}",
+)
+verbosity=0
+
+def load_remote_output(
+    wlcg_path: str,
+) -> list[str]:
+    """Function to load file paths from a remote WLCG target *wlcg_path*.
+    First, the function checks for the gfal2 module. If gfal is loaded correctly,
+    the list of files from the remote directly *wlcg_path* is loaded.
+    If any of these steps fail, an empty list is returned
+
+    Args:
+        wlcg_path (str):    Path to the WLCG remote target, which consists of the
+                            WLCG prefix and the actual directory on the remote
+                            site (constructed from global wlcg_template)
+
+    Returns:
+        list[str]:  List of files in remote target *wlcg_path*. Defaults to
+                    empty list.
+    """
+    # check for gfal
+    if not gfal2:
+        print("gfal2 was not imported, skipping this part")
+        return []
+    # This next part fails if the remote target does not exist, so wrap
+    # it with try
+    try:
+        # create gfal context
+        ctx = gfal2.creat_context()
+        # load list of files
+        return ctx.listdir(wlcg_path)
+    except Exception as e:
+        if verbosity >= 1:
+            print(f"unable to load files from {wlcg_path}, skipping")
+            from IPython import embed; embed()
+        return []
 
 def check_job_outputs(
-    wlcg_dir: str,
-    wlcg_prefix: str,
-    timestamp: str,
     collector_set: set[str],
     input_map: dict[str, list[str]],
     job_details: dict[str, dict],
-    state: str="failed"
+    state: str="failed",
+    job_outputs: set or None=None,
 ) -> None:
     """Function to collect information about jobs in *job_details*.
     First, all job ids with state *state* are retrieved from *job_details*.
@@ -26,14 +75,11 @@ def check_job_outputs(
     were successfully processed. In this case, an additional check whether
     a lfn is already marked as done is performed, and raises an error if
     a marked lfn is supposed to be added again.
-
-    TODO: implement file readout with gfal
+    If the set *job_outputs* is neither None nor empty, the file paths are
+    matched to the job ids with the current state. Only IDs with output files
+    are considered further.
 
     Args:
-        wlcg_dir (str): path for WLCG directory
-        wlcg_prefix (str): prefix to contact the WLCG directory via gfal
-        timestamp (str):    time stamp of the job to find the correct path
-                            on the (remote) WLCG site
         collector_set (set):    set to be filled with information, depending on 
                                 *state* (see description above)
         input_map (dict): Dictionary of format {job_id: list_of_lfns}
@@ -44,36 +90,58 @@ def check_job_outputs(
         state (str, optional):  State to select the relevant job ids.
                                 Must be either "failed" or "finished".
                                 Defaults to "failed".
+        job_outputs (set, optional):    if a set of output files is given,
+                                        only job ids with output files are
+                                        considered as relevant. Defaults to None
 
     Raises:
         ValueError: If a lfn is already marked as done but is associated with
                     a done job again, the ValueError is raised.
     """
-    relevant_ids = filter(
+    relevant_ids = set(filter(
         lambda x: job_details[x]["State"] == state,
         job_details
-    )
-    #TODO implement readout via gfal
+    ))
 
+    # if there are paths to the job outputs available, only select ids that
+    # actually have an output
+    if isinstance(job_outputs, set) and not len(job_outputs) == 0:
+        relevant_ids = set(filter(
+            lambda x: any(path.endswith(f"nano_{x}.root") for path in job_outputs), 
+            relevant_ids
+        ))
 
     # for state "failed", collect output files that should not be there
     if state == "failed":
-        pass
+        collector_set.update(filter(
+            lambda x: any(x.endswith(f"nano_{id}.root") for id in relevant_ids), 
+            job_outputs
+        ))
     # if state is finished, safe the done lfns (if the output of the job is also 
     # available)
     elif state == "finished":
+        lfns = set()
+        
         # first check if a lfn is already marked as done - this should not happen
         lfns = set(chain.from_iterable([input_map[x] for x in relevant_ids]))
+
         overlap = collector_set.intersection(lfns)
         if len(overlap) != 0:
-            overlap_string = "\n".join(overlap)
-            raise ValueError(f"""
-            The following lfns were already marked as done:
-            {overlap_string}
+            if verbosity == 0:
+                msg = " ".join(f"""
+                    {len(overlap)} LFNs are already marked as 'done' but
+                    have come up here again. This should not happen
+                """.split())
+                raise ValueError(msg)
+            else:
+                overlap_string = "\n".join(overlap)
+                raise ValueError(f"""
+                The following lfns were already marked as done:
+                {overlap_string}
 
-            This should not happen!
-            """)
-        
+                This should not happen!
+                """)
+            
         collector_set.update(lfns)
 
 def get_job_inputs(crab_dir: str, job_input_file: str="job_input_files.json"):
@@ -105,7 +173,8 @@ def get_job_inputs(crab_dir: str, job_input_file: str="job_input_files.json"):
 
     # if the file does not exist, raise an error
     if not os.path.exists(path):
-        raise ValueError(f"Could not load input mapping from file '{path}'")
+        print(f"Could not load input mapping from file '{path}'")
+        return None
 
     # load json file
     with open(path) as f:
@@ -173,7 +242,55 @@ def check_status(status: dict[str, dict], crab_dir: str) -> None:
 
     # do the comparison
     if not status_project_dir or not status_project_dir == abs_crab_dir:
-        raise ValueError("Project dir in status file does not match current crab dir under scutiny!")
+        msg = "Project dir in status file does not match current crab dir under scutiny!"
+        raise ValueError(msg)
+
+def parse_sample_name(sample_name: str, sample_config: str) -> str:
+    """small function to translate the sample name attributed by the 
+    crabOverseer to the original MC campaign name. First, the *sample_config*
+    is opened (has to be in yaml format!). Afterwards, the entry *sample_name*
+    is extracted. This entry should be a dictionary itself, which should contain
+    the key 'miniAOD' with the DAS key for this sample. The original 
+    campaign name is then extracted from the DAS key. If any of these steps
+    fails, the fucntion returns an empty string
+
+    Args:
+        sample_name (str): Name of the sample as provided in the sample config
+        sample_config (str):    path to the sample_config.yaml file containing 
+                                the information mentioned above.
+
+    Returns:
+        str: if successful, returns the original campaign name, else ""
+    """    
+    sample_campaign = ""
+
+    # open the sample config
+    with open(sample_config) as f:
+        sample_dict = yaml.load(f, yaml.Loader)
+
+    # look up information for sample_name
+    sample_info = sample_dict.get(sample_name, dict())
+    # if there is no sample information, exit here
+    if len(sample_info) == 0:
+        if verbosity >= 1:
+            print(f"WARNING: Unable to load information for sample '{sample_name}'")
+        return sample_campaign
+    
+    # load information about the original miniAOD DAS key
+    das_key = sample_info.get("miniAOD", None)
+    if not isinstance(das_key, str):
+        if verbosity >= 1:
+            msg=" ".join(f"""
+            WARNING: Unable to load das key of original miniAODs for sample 
+            '{sample_name}'
+            """.split())
+            print(msg)
+        return sample_campaign
+
+    # original campaign name is the first part of the DAS key
+    sample_campaign = das_key.split("/")[1]
+    
+    return sample_campaign
 
 def check_crab_directory(
     sample_dir: str,
@@ -186,7 +303,8 @@ def check_crab_directory(
     pbar: Iterable,
     wlcg_dir: str,
     wlcg_prefix: str,
-    job_input_file: str="job_input_files.json"
+    sample_config: str,
+    job_input_file: str="job_input_files.json",
 ) -> None:
     """Function to check a specific crab base directory in *sample_dir*.
     First, the name of the crab base directory (*crab_dir*) is built from
@@ -234,13 +352,18 @@ def check_crab_directory(
     crab_dirname = f"crab_{sample_name}"+suffix
     crab_dir = os.path.join(sample_dir, crab_dirname)
     if not os.path.exists(crab_dir):
-        print(f"Directory {crab_dir} does not exist, will stop looking here")
+        if verbosity >= 1:
+            print(f"Directory {crab_dir} does not exist, will stop looking here")
         return
     pbar.set_description(f"Checking directory {crab_dir}")
     
     # load the input file mapping of the form 'job_ids' -> list of lfns
     input_map = get_job_inputs(crab_dir=crab_dir, job_input_file=job_input_file)
     
+    if not input_map:
+        if verbosity >= 1:
+            print(f"WARNING: could not load input map for directory {crab_dir}")
+        return
     # perform sanity checks
     # first load a flat list of lfns
     flat_lfns = set(chain.from_iterable(input_map.values()))
@@ -255,14 +378,25 @@ def check_crab_directory(
         # if we enter here, lfns appeared that were previously unknown
         # this shouldn't be possible (unless maybe due to TAPE_RECALLS)
         # currently being checked
-        unknown_lfns_string = "\n".join(unknown_lfns)
-        from IPython import embed; embed()
-        raise ValueError(f"""
-            Following lfns are not known in '{crab_dir}':
-            {unknown_lfns_string}
+        msg = ""
+        if verbosity == 0:
+            msg = f"""
+            Encountered {len(unknown_lfns)} while processing dir '{crab_dir}'
+            This is not expected. For more information, use higher level of
+            verbosity.
+            """
+            # raise ValueError(msg)
+            
+        else:
+            unknown_lfns_string = "\n".join(unknown_lfns)
+            from IPython import embed; embed()
+            # raise ValueError(f"""
+            #     Following lfns are not known in '{crab_dir}':
+            #     {unknown_lfns_string}
 
-            This should not happen!
-            """)
+            #     This should not happen!
+            #     """)
+        known_lfns.update(flat_lfns)
 
     # load the dictionary containing the job stati
     status = get_status(
@@ -285,11 +419,35 @@ def check_crab_directory(
         raise ValueError("Could not retrieve time stamp from status json!")
     time_stamp = time_stamp.split(":")[0]
 
+    this_wlcg_template = wlcg_template.format(
+        wlcg_prefix=wlcg_prefix,
+        wlcg_dir=wlcg_dir,
+        sample_name=parse_sample_name(sample_name=sample_name, sample_config=sample_config),
+        crab_dirname=crab_dirname,
+        time_stamp=time_stamp
+    )
+
+    # create complete path on remote WLCG system to output file
+    # crab arranges the output files in blocks depending on the job id
+    
+    # get maximum ID to identify maximum block number later
+    max_jobid = np.max([int(x) for x in job_details.keys()])
+    # from IPython import embed; embed()
+    # initialize set of outputs
+    job_outputs = set()
+    # get the maximum block number and iterate through the blocks
+    pbar_blocks = tqdm(range(int(max_jobid/1000)+1))
+    for i in pbar_blocks:
+        pbar_blocks.set_description(f"Loading outputs for block {i:04d}")
+        job_outputs.update(
+            load_remote_output(
+                wlcg_path=os.path.join(this_wlcg_template, f"{i:04d}")
+            )
+        )
+
     # load information about failed jobs
     check_job_outputs(
-        wlcg_dir=wlcg_dir,
-        wlcg_prefix=wlcg_prefix,
-        timestamp=time_stamp,
+        job_outputs=job_outputs,
         collector_set=failed_job_outputs,
         input_map=input_map,
         job_details=job_details,
@@ -298,9 +456,7 @@ def check_crab_directory(
 
     # load information about failed jobs
     check_job_outputs(
-        wlcg_dir=wlcg_dir,
-        wlcg_prefix=wlcg_prefix,
-        timestamp=time_stamp,
+        job_outputs=job_outputs,
         collector_set=done_lfns,
         input_map=input_map,
         job_details=job_details,
@@ -320,8 +476,10 @@ def main(*args, **kwargs):
     wlcg_prefix = kwargs.get("wlcg_prefix", "")
     suffices = kwargs.get("suffix", [])
     status_files = kwargs.get("status_files", [])
+    sample_config = kwargs.get("sample_config", None)
 
-    missing_lfns = dict()
+    meta_infos = dict()
+
     # loop through the sample directories containing the crab base directories
     pbar_sampledirs = tqdm(sample_dirs)
     for sample_dir in pbar_sampledirs:
@@ -357,20 +515,96 @@ def main(*args, **kwargs):
                 pbar=pbar_suffix,
                 wlcg_dir=wlcgs_dir,
                 wlcg_prefix=wlcg_prefix,
+                sample_config=sample_config,
             )
 
         # in the end, all LFNs should be accounted for
         unprocessed_lfns = known_lfns.symmetric_difference(done_lfns)
-        if len(unprocessed_lfns) != 0:
-            missing_lfns[sample_dir] = unprocessed_lfns
+
+        sample_dict = dict()
+        sample_dict["total"] = len(known_lfns)
+        sample_dict["done"] = len(done_lfns)
+        sample_dict["missing"] = len(unprocessed_lfns)
+        sample_dict["outputs from failed jobs"] = len(failed_job_outputs)
+        meta_infos[sample_dir] = sample_dict.copy()
+        
+        if verbosity >= 1:
+            if len(failed_job_outputs) != 0:
+                print("WARNING: found job outputs that should not be there")
+                print(f"Sample: {sample_dir}")
+                for f in failed_job_outputs:
+                    print(f)
+            if len(unprocessed_lfns) != 0:
+                print(f"WARNING: following LFNs for sample {sample_dir} were not processed!")
+                for f in unprocessed_lfns:
+                    print(f)
     
     # do some final sanity check: if we found missing lfns, print them here
     # so the user can do something
-    if len(missing_lfns) != 0:
-        print("found missing lfns for the following samples")
-        print(missing_lfns)
-    else:
-        print("everything ok!")
+    build_meta_info_table(meta_infos=meta_infos)
+
+    samples_with_missing_lfns = filter(
+        lambda x: meta_infos[x]["missing"] != 0, meta_infos
+    )
+    if len(samples_with_missing_lfns) != 0:
+        print("\n\n")
+        print("Samples with missing LFNS:")
+        build_meta_info_table(
+            meta_infos={x: meta_infos[x] for x in samples_with_missing_lfns},
+            outfilename="samples_with_missing_lfns.json"
+        )
+
+def build_meta_info_table(
+    meta_infos: dict,
+    outfilename: str="crab_job_summary.json"
+) -> None:
+    """Helper function to convert collected information of crab jobs into
+    human-readable table. The information is safed in *meta_infos*, which
+    is a dictionary of the format
+    {
+        sample_name: {
+            "total": TOTAL_NUMBER_OF_LFNS,
+            "done": NUMBER_OF_DONE_LFNS,
+            "missing": NUMBER_OF_MISSING_LFNS,
+            "outputs from failed jobs": NUMBER_OF_OUTPUTS_FROM_FAILED_JOBS
+        }
+    }
+
+    Current supported formats: markdown (md)
+
+    Args:
+        meta_infos (dict): Dictionary containing above mentioned information
+    """    
+
+    # first build the header of the table
+    headerparts = ["{: ^16}".format(x) 
+                for x in ["Sample", "Total #LFNs", "Done #LFNs", 
+                            "Missing #LFNs", "#Outputs from failed"
+                        ]
+            ]
+    lines = ["| {} |".format(" | ".join(headerparts))]
+    # markdown tables have a separation line with one '---' per column
+    lines += ["| {} |".format(" | ".join(["---"]*len(headerparts)))]
+    # loop through the samples that were processed
+    for s in meta_infos:
+        # load information for table
+        tot = meta_infos[s]["total"]
+        done = meta_infos[s]["done"]
+        missing = meta_infos[s]["missing"]
+        failed = meta_infos[s]["outputs from failed jobs"]
+        # create line for table
+        lines.append("| {} |".format(" | ".join(
+                ["{: ^16}".format(x) 
+                    for x in [s, tot, done, missing, failed ]
+                ]
+            )
+            )
+        )
+    # create final table
+    table = "\n".join(lines)
+    print(table)
+    with open(outfilename, "w") as f:
+        json.dump(meta_infos, f, indent=4)
 
 
 def parse_arguments():
@@ -394,6 +628,14 @@ def parse_arguments():
     You can specify which suffixes (e.g. *recovery_1*) are to be checked, 
     see options below. Note that the order you specify in this option is also
     the order in which the directories are checked.
+
+    If you want to check the outputs of the jobs on the (remote) target site,
+    make sure that gfal2 is available to python. On lxplus, you can do this
+    by first using
+
+    source "/cvmfs/grid.cern.ch/centos7-ui-160522/etc/profile.d/setup-c7-ui-python3-example.sh" ""
+
+    Note that this only works on SLC7 machines at the moment, not on CentOS 8.
     """
     usage = "python %(prog)s [options] path/to/directories/containting/crab_base_dirs"
 
@@ -454,6 +696,21 @@ def parse_arguments():
     )
 
     parser.add_argument(
+        "--sample-config", "-c",
+        help=" ".join(
+            """
+            path to sample config that contains the information about the
+            original miniaod files (and thus the original name of the sample).
+            Config must be the in yaml format!
+            """.split()
+        ),
+        default=None,
+        required=True,
+        dest="sample_config",
+        metavar="path/to/sample_config.yaml"
+    )
+
+    parser.add_argument(
         "sample_dirs",
         help=" ".join("""
             Path to sample diectories containing the crab base directories
@@ -464,12 +721,31 @@ def parse_arguments():
         nargs="+",
     )
 
+    parser.add_argument(
+        "-v", "--verbosity",
+        type=int,
+        default=0,
+        help=" ".join(
+            """
+                control the verbosity of the output. Currently implemented levels
+                0: just print number of files/outputs for each sample
+                1: actually print the paths for the different files
+            """.split()
+        )
+    )
+
     args = parser.parse_args()
     if args.suffix == None:
         args.suffix = ["", "recovery_1", "recovery_2"]
 
     if args.status_files == None:
         args.status_files = ["status_0", "status_1", "status"]
+    
+    if not os.path.exists(args.sample_config):
+        parser.error(f"file {args.sample_config} does not exist!")
+    
+    global verbosity
+    verbosity = args.verbosity
     return args
 
 if __name__ == '__main__':
