@@ -7,6 +7,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from tqdm import tqdm
 from itertools import chain
 from collections.abc import Iterable
+from subprocess import PIPE, Popen
 import numpy as np
 
 try:
@@ -245,14 +246,12 @@ def check_status(status: dict[str, dict], crab_dir: str) -> None:
         msg = "Project dir in status file does not match current crab dir under scutiny!"
         raise ValueError(msg)
 
-def parse_sample_name(sample_name: str, sample_config: str) -> str:
-    """small function to translate the sample name attributed by the 
-    crabOverseer to the original MC campaign name. First, the *sample_config*
+def load_das_key(sample_name: str, sample_config: str) -> str or None:
+    """Small function to extract the DAS key for sample *sample_name* 
+    from the *sample_config*. First, the *sample_config*
     is opened (has to be in yaml format!). Afterwards, the entry *sample_name*
     is extracted. This entry should be a dictionary itself, which should contain
-    the key 'miniAOD' with the DAS key for this sample. The original 
-    campaign name is then extracted from the DAS key. If any of these steps
-    fails, the fucntion returns an empty string
+    the key 'miniAOD' with the DAS key for this sample.
 
     Args:
         sample_name (str): Name of the sample as provided in the sample config
@@ -260,10 +259,9 @@ def parse_sample_name(sample_name: str, sample_config: str) -> str:
                                 the information mentioned above.
 
     Returns:
-        str: if successful, returns the original campaign name, else ""
+        str or None: If successfull, this function returns the DAS key, else None
     """    
-    sample_campaign = ""
-
+    das_key = None
     # open the sample config
     with open(sample_config) as f:
         sample_dict = yaml.load(f, yaml.Loader)
@@ -274,15 +272,29 @@ def parse_sample_name(sample_name: str, sample_config: str) -> str:
     if len(sample_info) == 0:
         if verbosity >= 1:
             print(f"WARNING: Unable to load information for sample '{sample_name}'")
-        return sample_campaign
-    
+        return das_key
+    return sample_info.get("miniAOD", None)
+
+def get_campaign_name(das_key: str=None) -> str:
+    """small function to translate the sample name attributed by the 
+    crabOverseer to the original MC campaign name. The original 
+    campaign name is then extracted from the DAS key. If any of these steps
+    fails, the fucntion returns an empty string
+
+    Args:
+        das_key (str):  DAS key in str format. Any other format will return
+                        the default value of '""'.
+
+    Returns:
+        str: if successful, returns the original campaign name, else ""
+    """    
+    sample_campaign = ""
     # load information about the original miniAOD DAS key
-    das_key = sample_info.get("miniAOD", None)
     if not isinstance(das_key, str):
         if verbosity >= 1:
             msg=" ".join(f"""
-            WARNING: Unable to load das key of original miniAODs for sample 
-            '{sample_name}'
+            WARNING: Unable to load campaign name from das key of type
+            '{type(das_key)}'
             """.split())
             print(msg)
         return sample_campaign
@@ -296,6 +308,7 @@ def check_crab_directory(
     sample_dir: str,
     sample_name: str,
     suffix: str,
+    das_key: str,
     status_file: str,
     known_lfns: set[str],
     done_lfns: set[str],
@@ -303,7 +316,6 @@ def check_crab_directory(
     pbar: Iterable,
     wlcg_dir: str,
     wlcg_prefix: str,
-    sample_config: str,
     job_input_file: str="job_input_files.json",
 ) -> None:
     """Function to check a specific crab base directory in *sample_dir*.
@@ -322,6 +334,10 @@ def check_crab_directory(
         sample_dir (str): path to the directory containing the crab base directories
         sample_name (str): Name of the current sample (as it is in sample_dir).
                             Used to build name of crab directory via 'crab_*sample_name*'
+        sample_campaing (str):  Name of the official campaign for sample 
+                                *sample_name*. Can be obtained with 
+                                meth::`parse_sample_name` based on the
+                                sample_name and the sample_config.yaml file
         suffix (str):   suffix to use for the current crab directory, such that 
                         the final name of the *crab_dir* is 
                         'crab_*sample_name*_*suffix*'
@@ -422,7 +438,7 @@ def check_crab_directory(
     this_wlcg_template = wlcg_template.format(
         wlcg_prefix=wlcg_prefix,
         wlcg_dir=wlcg_dir,
-        sample_name=parse_sample_name(sample_name=sample_name, sample_config=sample_config),
+        sample_name=get_campaign_name(das_key=das_key),
         crab_dirname=crab_dirname,
         time_stamp=time_stamp
     )
@@ -463,6 +479,46 @@ def check_crab_directory(
         state="finished",
     )
 
+def get_das_information(
+    das_key: str,
+    relevant_info: str="nfiles",
+    default: int=-1,
+) -> int:
+    output_value = default
+    # execute DAS query for sample with *das_key*
+    process = Popen(
+        [f"dasgoclient --query '{das_key}' -json"], 
+        shell=True, stdin=PIPE, stdout=PIPE
+    )
+    # load output of query
+    output, stderr = process.communicate()
+    # from IPython import embed; embed()
+    # output is a string of form list(dict()) and can be parsed with
+    # the json module
+    try:
+        das_infos = json.loads(output)
+    except Exception as e:
+        # something went wrong in the parsing, so just return the default
+        return output_value
+    # not all dicts have the same (relevant) information, so go look for the
+    # correct entry in list. Relevant information for us is the total
+    # number of LFNs 'nfiles'
+    relevant_values = list(set(
+        y.get(relevant_info) 
+        # only consider entries in DAS info list with dataset information
+        for x in das_infos if "dataset" in x.keys() 
+        # only consider those elements in dataset info that also have 
+        # the relevant information
+        for y in x["dataset"] if relevant_info in y.keys()
+    ))
+    # if this set is has more than 1 or zero entries, something went wrong
+    # when obtaining the relevant information, so return the default value
+
+    # if the set has exactly one entry, we were able to extract the relevant
+    # information, so return it accordingly
+    if len(relevant_values) == 1:
+        output_value = relevant_values[0]
+    return output_value
 
 def main(*args, **kwargs):
     """main function. Load information provided by the ArgumentParser. Loops
@@ -493,7 +549,12 @@ def main(*args, **kwargs):
         # extract the sample name from the sample directory
         sample_name=os.path.basename(sample_dir)
         pbar_sampledirs.set_description(f"Checking sample {sample_name}")
+        das_key = load_das_key(
+            sample_name=sample_name, sample_config=sample_config
+        )
 
+        # get total number of LFNs from DAS
+        n_total = get_das_information(das_key=das_key)
         # set up the sets to keep track of the lfns
         known_lfns=set()    # full set of lfns for this sample
         done_lfns=set()     # set of lfns processed by successful jobs
@@ -515,13 +576,14 @@ def main(*args, **kwargs):
                 pbar=pbar_suffix,
                 wlcg_dir=wlcgs_dir,
                 wlcg_prefix=wlcg_prefix,
-                sample_config=sample_config,
+                das_key=das_key,
             )
 
         # in the end, all LFNs should be accounted for
         unprocessed_lfns = known_lfns.symmetric_difference(done_lfns)
 
         sample_dict = dict()
+        sample_dict["das_total"] = n_total
         sample_dict["total"] = len(known_lfns)
         sample_dict["done"] = len(done_lfns)
         sample_dict["missing"] = len(unprocessed_lfns)
@@ -543,9 +605,13 @@ def main(*args, **kwargs):
     # so the user can do something
     build_meta_info_table(meta_infos=meta_infos)
 
-    samples_with_missing_lfns = filter(
-        lambda x: meta_infos[x]["missing"] != 0, meta_infos
-    )
+    samples_with_missing_lfns = list(filter(
+        lambda x: meta_infos[x]["missing"] != 0 or 
+                   ( meta_infos[x]["das_total"] != meta_infos[x]["total"] 
+                        and meta_infos[x]["das_total"] != -1
+                    ), 
+        meta_infos
+    ))
     if len(samples_with_missing_lfns) != 0:
         print("\n\n")
         print("Samples with missing LFNS:")
@@ -563,6 +629,7 @@ def build_meta_info_table(
     is a dictionary of the format
     {
         sample_name: {
+            "das_total": TOTAL_NUMBER_OF_LFNS_IN_DAS
             "total": TOTAL_NUMBER_OF_LFNS,
             "done": NUMBER_OF_DONE_LFNS,
             "missing": NUMBER_OF_MISSING_LFNS,
@@ -578,8 +645,9 @@ def build_meta_info_table(
 
     # first build the header of the table
     headerparts = ["{: ^16}".format(x) 
-                for x in ["Sample", "Total #LFNs", "Done #LFNs", 
-                            "Missing #LFNs", "#Outputs from failed"
+                for x in ["Sample", "DAS Total #LFNs", "Total #LFNs", 
+                            "Done #LFNs", "Missing #LFNs", 
+                            "#Outputs from failed",
                         ]
             ]
     lines = ["| {} |".format(" | ".join(headerparts))]
@@ -588,6 +656,7 @@ def build_meta_info_table(
     # loop through the samples that were processed
     for s in meta_infos:
         # load information for table
+        das_tot = meta_infos[s]["das_total"]
         tot = meta_infos[s]["total"]
         done = meta_infos[s]["done"]
         missing = meta_infos[s]["missing"]
@@ -595,7 +664,7 @@ def build_meta_info_table(
         # create line for table
         lines.append("| {} |".format(" | ".join(
                 ["{: ^16}".format(x) 
-                    for x in [s, tot, done, missing, failed ]
+                    for x in [s, das_tot, tot, done, missing, failed ]
                 ]
             )
             )
