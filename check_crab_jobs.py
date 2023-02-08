@@ -18,6 +18,18 @@ except ImportError as e:
     print("gfal will be disabled!")
     gfal2 = None
 
+# setup dbs search
+try:
+    from dbs.apis.dbsClient import DbsApi
+    cms_dbs_url = "https://cmsweb.cern.ch/dbs/prod/global/DBSReader"
+    api = DbsApi(url=cms_dbs_url)
+except:
+    print("WARNING: Could not find dbs3 module. Did you install it with")
+    print("python3 -m pip install --user dbs3-client")
+    print("?")
+    print("Will use dasgoclient as fallback instead")
+    api = None
+
 wlcg_template= os.path.join("{wlcg_prefix}{wlcg_dir}",
     "{sample_name}",
     "{crab_dirname}",
@@ -52,7 +64,8 @@ def load_remote_output(
         # create gfal context
         ctx = gfal2.creat_context()
         # load list of files
-        return ctx.listdir(wlcg_path)
+        filelist = ctx.listdir(wlcg_path)
+        return [os.path.join(wlcg_path, x) for x in filelist]
     except Exception as e:
         if verbosity >= 1:
             print(f"unable to load files from {wlcg_path}, skipping")
@@ -479,12 +492,46 @@ def check_crab_directory(
         state="finished",
     )
 
+def get_dbs_lfns(das_key: str) -> set[str]:
+    """Small function to load complete list of valid LFNs for dataset with
+    DAS key *das_key*. Only files where the flag 'is_file_valid' is True
+    are considered. Returns set of lfn paths if successful, else an empty set
+
+    Args:
+        das_key (str): key in CMS DBS service for the dataset of interest
+
+    Returns:
+        set[str]: Set of LFN paths
+    """    
+    # initialize output set as empty
+    output_set = set()
+
+    # if the api for the dbs interface was initialized sucessfully, we can
+    # load the files
+    if api:
+        # load the file list for this dataset
+        file_list = api.listFiles(dataset=das_key, detail=1)
+        # by default, this list contains _all_ files (also LFNs that are not
+        # reachable) so filter out broken files
+        file_list = list(filter(
+            lambda x: x["is_file_valid"] == True,
+            file_list
+        ))
+        output_set = set([x["logical_file_name"] for x in file_list])
+    return output_set 
+
 def get_das_information(
     das_key: str,
-    relevant_info: str="nfiles",
+    relevant_info: str="num_file",
     default: int=-1,
 ) -> int:
+    allowed_modes="file_size num_event num_file".split()
+    if not relevant_info in allowed_modes:
+        raise ValueError(f"""Could not load information '{relevant_info}'
+        because it's not part of the allowed modes: file_size, num_event, num_file
+        """)
     output_value = default
+
     # execute DAS query for sample with *das_key*
     process = Popen(
         [f"dasgoclient --query '{das_key}' -json"], 
@@ -520,20 +567,22 @@ def get_das_information(
         output_value = relevant_values[0]
     return output_value
 
-def main(*args, **kwargs):
+def main(*args,
+    sample_dirs=[],
+    wlcg_dir=None,
+    wlcg_prefix="",
+    suffices=[],
+    status_files=[],
+    sample_config=None,
+    dump_filelists=False,
+    **kwargs
+):
     """main function. Load information provided by the ArgumentParser. Loops
     Thorugh the sample directories provided as *sample_dirs* and the *suffices*
     to check the individual crab base directories.
     Finally, check if any lfns are unaccounted for in the list of finished jobs.
     """  
     # load the information from the argument parser  
-    sample_dirs = kwargs.get("sample_dirs", [])
-    wlcgs_dir = kwargs.get("wlcg_dir", None)
-    wlcg_prefix = kwargs.get("wlcg_prefix", "")
-    suffices = kwargs.get("suffix", [])
-    status_files = kwargs.get("status_files", [])
-    sample_config = kwargs.get("sample_config", None)
-
     meta_infos = dict()
 
     # loop through the sample directories containing the crab base directories
@@ -553,10 +602,18 @@ def main(*args, **kwargs):
             sample_name=sample_name, sample_config=sample_config
         )
 
-        # get total number of LFNs from DAS
-        n_total = get_das_information(das_key=das_key)
+        # get full set of lfns for this sample
+        known_lfns=get_dbs_lfns(das_key=das_key)   
+
+        # if the dbs could not be contacted for some reason, use DAS
+        # to load the total number of LFNS
+        if len(known_lfns) > 0:
+            n_total = len(known_lfns)
+        else:
+            # get total number of LFNs from DAS
+            n_total = get_das_information(das_key=das_key)
+
         # set up the sets to keep track of the lfns
-        known_lfns=set()    # full set of lfns for this sample
         done_lfns=set()     # set of lfns processed by successful jobs
         
         # set of **outputs** from failed jobs, which shouldn't happen
@@ -574,7 +631,7 @@ def main(*args, **kwargs):
                 done_lfns=done_lfns,
                 failed_job_outputs=failed_job_outputs,
                 pbar=pbar_suffix,
-                wlcg_dir=wlcgs_dir,
+                wlcg_dir=wlcg_dir,
                 wlcg_prefix=wlcg_prefix,
                 das_key=das_key,
             )
@@ -586,9 +643,14 @@ def main(*args, **kwargs):
         sample_dict["das_total"] = n_total
         sample_dict["total"] = len(known_lfns)
         sample_dict["done"] = len(done_lfns)
-        sample_dict["missing"] = len(unprocessed_lfns)
         sample_dict["outputs from failed jobs"] = len(failed_job_outputs)
-        meta_infos[sample_dir] = sample_dict.copy()
+        sample_dict["missing"] = len(unprocessed_lfns)
+        if dump_filelists:
+            sample_dict["total_lfns"] = list(known_lfns.copy())
+            sample_dict["done_lfns"] = list(done_lfns.copy())
+            sample_dict["missing_lfns"] = list(unprocessed_lfns.copy())
+            sample_dict["failed_outputs"] = list(failed_job_outputs.copy())
+        meta_infos[sample_name] = sample_dict.copy()
         
         if verbosity >= 1:
             if len(failed_job_outputs) != 0:
@@ -607,7 +669,7 @@ def main(*args, **kwargs):
 
     samples_with_missing_lfns = list(filter(
         lambda x: meta_infos[x]["missing"] != 0 or 
-                   ( meta_infos[x]["das_total"] != meta_infos[x]["total"] 
+                   ( meta_infos[x]["das_total"] != meta_infos[x]["total"]
                         and meta_infos[x]["das_total"] != -1
                     ), 
         meta_infos
@@ -724,6 +786,7 @@ def parse_arguments():
         type=str,
         default=None,
         required=True,
+        dest="wlcg_dir",
     )
     parser.add_argument(
         "--wlcg-prefix",
@@ -735,10 +798,11 @@ def parse_arguments():
             """.split()
         ),
         type=str,
-        default="srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN="
+        default="srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=",
+        dest="wlcg_prefix"
     )
     parser.add_argument(
-        "-s", "--suffix",
+        "-s", "--suffices",
         help=" ".join("""
             specify the suffices you would like for the check of the crab
             source directory. Can be a list of suffices, e.g. 
@@ -780,6 +844,20 @@ def parse_arguments():
     )
 
     parser.add_argument(
+        "--dump-filelists",
+        help=" ".join(
+            """
+            save the paths to all lfns, the done lfns, the missing lfns
+            and to outputs on the WLCG remote site from failed jobs
+            in the final summary .json file. Defaults to False
+            """.split()
+        ),
+        default=False,
+        action="store_true",
+        dest="dump_filelists",
+    )
+
+    parser.add_argument(
         "sample_dirs",
         help=" ".join("""
             Path to sample diectories containing the crab base directories
@@ -804,8 +882,8 @@ def parse_arguments():
     )
 
     args = parser.parse_args()
-    if args.suffix == None:
-        args.suffix = ["", "recovery_1", "recovery_2"]
+    if args.suffices == None:
+        args.suffices = ["", "recovery_1", "recovery_2"]
 
     if args.status_files == None:
         args.status_files = ["status_0", "status_1", "status"]
