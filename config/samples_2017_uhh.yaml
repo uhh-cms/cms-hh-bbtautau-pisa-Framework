@@ -912,7 +912,10 @@ TTToSemiLeptonic:
   miniAOD: /TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   sampleType: mc
   remoteBase: philip_v2
-  timestamps: []
+  timestamps:
+    - null
+    - "230117_081747"
+    - "230124_150535"
 
 TTToHadronic:
   miniAOD: /TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
