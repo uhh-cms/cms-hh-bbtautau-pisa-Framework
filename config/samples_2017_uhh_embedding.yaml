@@ -1,0 +1,87 @@
+GLOBAL:
+  era: Run2_2017
+  nanoVersion: v11
+  remoteBases:
+    bogdan_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/bwieders/crab_nano_v11_v2
+    philip_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/pkeicher/crab_nano_v11_v2
+
+EmbeddingRun2017B_ElMuFinalState:
+  miniAOD: /EmbeddingRun2017B/ElMuFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017B_ElTauFinalState:
+  miniAOD: /EmbeddingRun2017B/ElTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017B_MuTauFinalState:
+  miniAOD: /EmbeddingRun2017B/MuTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017B_TauTauFinalState:
+  miniAOD: /EmbeddingRun2017B/TauTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017C_ElMuFinalState:
+  miniAOD: /EmbeddingRun2017C/ElMuFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017C_ElTauFinalState:
+  miniAOD: /EmbeddingRun2017C/ElTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017C_MuTauFinalState:
+  miniAOD: /EmbeddingRun2017C/MuTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017C_TauTauFinalState:
+  miniAOD: /EmbeddingRun2017C/TauTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017D_ElMuFinalState:
+  miniAOD: /EmbeddingRun2017D/ElMuFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017D_ElTauFinalState:
+  miniAOD: /EmbeddingRun2017D/ElTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017D_MuTauFinalState:
+  miniAOD: /EmbeddingRun2017D/MuTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017D_TauTauFinalState:
+  miniAOD: /EmbeddingRun2017D/TauTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017E_ElMuFinalState:
+  miniAOD: /EmbeddingRun2017E/ElMuFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017E_ElTauFinalState:
+  miniAOD: /EmbeddingRun2017E/ElTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017E_MuTauFinalState:
+  miniAOD: /EmbeddingRun2017E/MuTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017E_TauTauFinalState:
+  miniAOD: /EmbeddingRun2017E/TauTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017F_ElMuFinalState:
+  miniAOD: /EmbeddingRun2017F/ElMuFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017F_ElTauFinalState:
+  miniAOD: /EmbeddingRun2017F/ElTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017F_MuTauFinalState:
+  miniAOD: /EmbeddingRun2017F/MuTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
+EmbeddingRun2017F_TauTauFinalState:
+  miniAOD: /EmbeddingRun2017F/TauTauFinalState-inputDoubleMu_106X_ULegacy_miniAOD-v1/USER
+  remoteBase: philip_v2
+  sampleType: mc
