@@ -17,7 +17,7 @@ GluGluToRadionToHHTo2B2Tau_M-250:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_162612"
+    - "230119_164708"
 
 GluGluToRadionToHHTo2B2Tau_M-260:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-260_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -38,14 +38,14 @@ GluGluToRadionToHHTo2B2Tau_M-280:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_162723"
+    - "230119_164813"
 
 GluGluToRadionToHHTo2B2Tau_M-300:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-300_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_162746"
+    - "230119_164833"
 
 GluGluToRadionToHHTo2B2Tau_M-320:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-320_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -59,7 +59,7 @@ GluGluToRadionToHHTo2B2Tau_M-350:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_162832"
+    - "230119_164934"
 
 GluGluToRadionToHHTo2B2Tau_M-400:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-400_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -73,7 +73,7 @@ GluGluToRadionToHHTo2B2Tau_M-450:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_162920"
+    - "230119_165023"
 
 GluGluToRadionToHHTo2B2Tau_M-500:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-500_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -101,21 +101,21 @@ GluGluToRadionToHHTo2B2Tau_M-650:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_163052"
+    - "230119_165104"
 
 GluGluToRadionToHHTo2B2Tau_M-700:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-700_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_163115"
+    - "230119_165124"
 
 GluGluToRadionToHHTo2B2Tau_M-750:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-750_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_163137"
+    - "230119_165144"
 
 GluGluToRadionToHHTo2B2Tau_M-800:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-800_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -129,14 +129,14 @@ GluGluToRadionToHHTo2B2Tau_M-850:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_163223"
+    - "230119_165205"
 
 GluGluToRadionToHHTo2B2Tau_M-900:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-900_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_163246"
+    - "230119_165228"
 
 GluGluToRadionToHHTo2B2Tau_M-1000:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-1000_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -150,14 +150,14 @@ GluGluToRadionToHHTo2B2Tau_M-1250:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_163332"
+    - "230119_164627"
 
 GluGluToRadionToHHTo2B2Tau_M-1500:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-1500_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_163355"
+    - "230119_164648"
 
 GluGluToRadionToHHTo2B2Tau_M-1750:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-1750_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -185,7 +185,7 @@ GluGluToRadionToHHTo2B2Tau_M-3000:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_163529"
+    - "230119_164853"
 
 GluGluToBulkGravitonToHHTo2B2Tau_M-250:
   miniAOD: /GluGluToBulkGravitonToHHTo2B2Tau_M-250_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -199,14 +199,14 @@ GluGluToBulkGravitonToHHTo2B2Tau_M-260:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_163619"
+    - "230119_164404"
 
 GluGluToBulkGravitonToHHTo2B2Tau_M-270:
   miniAOD: /GluGluToBulkGravitonToHHTo2B2Tau_M-270_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_163644"
+    - "230119_164425"
 
 GluGluToBulkGravitonToHHTo2B2Tau_M-280:
   miniAOD: /GluGluToBulkGravitonToHHTo2B2Tau_M-280_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
@@ -255,21 +255,21 @@ GluGluToBulkGravitonToHHTo2B2Tau_M-500:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_163928"
+    - "230119_164525"
 
 GluGluToBulkGravitonToHHTo2B2Tau_M-550:
   miniAOD: /GluGluToBulkGravitonToHHTo2B2Tau_M-550_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_163950"
+    - "230119_164546"
 
 GluGluToBulkGravitonToHHTo2B2Tau_M-600:
   miniAOD: /GluGluToBulkGravitonToHHTo2B2Tau_M-600_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_164013"
+    - "230119_164606"
 
 GluGluToBulkGravitonToHHTo2B2Tau_M-650:
   miniAOD: /GluGluToBulkGravitonToHHTo2B2Tau_M-650_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -388,7 +388,7 @@ VBFToRadionToHHTo2B2Tau_M-280:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_164645"
+    - "230119_165353"
 
 VBFToRadionToHHTo2B2Tau_M-300:
   miniAOD: /VBFToRadionToHHTo2B2Tau_M-300_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -402,7 +402,7 @@ VBFToRadionToHHTo2B2Tau_M-320:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_164730"
+    - "230119_165440"
 
 VBFToRadionToHHTo2B2Tau_M-350:
   miniAOD: /VBFToRadionToHHTo2B2Tau_M-350_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -423,7 +423,7 @@ VBFToRadionToHHTo2B2Tau_M-450:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_164841"
+    - "230119_165549"
 
 VBFToRadionToHHTo2B2Tau_M-500:
   miniAOD: /VBFToRadionToHHTo2B2Tau_M-500_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -437,7 +437,7 @@ VBFToRadionToHHTo2B2Tau_M-550:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_164926"
+    - "230119_170505"
 
 VBFToRadionToHHTo2B2Tau_M-600:
   miniAOD: /VBFToRadionToHHTo2B2Tau_M-600_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -493,7 +493,7 @@ VBFToRadionToHHTo2B2Tau_M-1000:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_165227"
+    - "230119_170400"
 
 VBFToRadionToHHTo2B2Tau_M-1250:
   miniAOD: /VBFToRadionToHHTo2B2Tau_M-1250_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -612,7 +612,7 @@ VBFToBulkGravitonToHHTo2B2Tau_M-550:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_165917"
+    - "230119_170232"
 
 VBFToBulkGravitonToHHTo2B2Tau_M-600:
   miniAOD: /VBFToBulkGravitonToHHTo2B2Tau_M-600_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -640,7 +640,7 @@ VBFToBulkGravitonToHHTo2B2Tau_M-750:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170052"
+    - "230119_170319"
 
 VBFToBulkGravitonToHHTo2B2Tau_M-800:
   miniAOD: /VBFToBulkGravitonToHHTo2B2Tau_M-800_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -654,7 +654,7 @@ VBFToBulkGravitonToHHTo2B2Tau_M-850:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170140"
+    - "230119_170339"
 
 VBFToBulkGravitonToHHTo2B2Tau_M-900:
   miniAOD: /VBFToBulkGravitonToHHTo2B2Tau_M-900_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -668,21 +668,21 @@ VBFToBulkGravitonToHHTo2B2Tau_M-1000:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170228"
+    - "230119_170024"
 
 VBFToBulkGravitonToHHTo2B2Tau_M-1250:
   miniAOD: /VBFToBulkGravitonToHHTo2B2Tau_M-1250_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170252"
+    - "230119_170045"
 
 VBFToBulkGravitonToHHTo2B2Tau_M-1500:
   miniAOD: /VBFToBulkGravitonToHHTo2B2Tau_M-1500_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170316"
+    - "230119_170105"
 
 VBFToBulkGravitonToHHTo2B2Tau_M-1750:
   miniAOD: /VBFToBulkGravitonToHHTo2B2Tau_M-1750_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -710,7 +710,7 @@ VBFToBulkGravitonToHHTo2B2Tau_M-3000:
   sampleType: mc
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170458"
+    - "230119_170210"
 
 # GluGluToHHTo2B2VLNu2J_node_cHHH0:
 #   miniAOD: /GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM
@@ -912,10 +912,7 @@ TTToSemiLeptonic:
   miniAOD: /TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   sampleType: mc
   remoteBase: philip_v2
-  timestamps:
-    - null
-    - "230117_081747"
-    - "230124_150535"
+  timestamps: []
 
 TTToHadronic:
   miniAOD: /TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -1212,28 +1209,28 @@ SingleMuon_Run2017D-UL:
   sampleType: data
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170613"
+    - "230119_165754"
 
 SingleMuon_Run2017E-UL:
   miniAOD: /SingleMuon/Run2017E-UL2017_MiniAODv2-v1/MINIAOD
   sampleType: data
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170637"
+    - "230119_165815"
 
 SingleMuon_Run2017F-UL:
   miniAOD: /SingleMuon/Run2017F-UL2017_MiniAODv2-v1/MINIAOD
   sampleType: data
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170701"
+    - "230119_165836"
 
 SingleElectron_Run2017B-UL:
   miniAOD: /SingleElectron/Run2017B-UL2017_MiniAODv2-v1/MINIAOD
   sampleType: data
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170726"
+    - "230119_165609"
 
 SingleElectron_Run2017C-UL:
   miniAOD: /SingleElectron/Run2017C-UL2017_MiniAODv2-v1/MINIAOD
@@ -1247,7 +1244,7 @@ SingleElectron_Run2017D-UL:
   sampleType: data
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170814"
+    - "230119_165629"
 
 SingleElectron_Run2017E-UL:
   miniAOD: /SingleElectron/Run2017E-UL2017_MiniAODv2-v1/MINIAOD
@@ -1261,7 +1258,7 @@ SingleElectron_Run2017F-UL:
   sampleType: data
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170901"
+    - "230119_165651"
 
 Tau_Run2017B-UL:
   miniAOD: /Tau/Run2017B-UL2017_MiniAODv2-v1/MINIAOD
@@ -1275,21 +1272,21 @@ Tau_Run2017C-UL:
   sampleType: data
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_170949"
+    - "230119_165918"
 
 Tau_Run2017D-UL:
   miniAOD: /Tau/Run2017D-UL2017_MiniAODv2-v1/MINIAOD
   sampleType: data
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_171014"
+    - "230119_165939"
 
 Tau_Run2017E-UL:
   miniAOD: /Tau/Run2017E-UL2017_MiniAODv2-v1/MINIAOD
   sampleType: data
   remoteBase: bogdan_v2
   timestamps:
-    - "221221_171038"
+    - "230119_165959"
 
 Tau_Run2017F-UL:
   miniAOD: /Tau/Run2017F-UL2017_MiniAODv2-v1/MINIAOD
