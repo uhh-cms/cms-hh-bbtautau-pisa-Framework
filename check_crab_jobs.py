@@ -13,7 +13,8 @@ thisdir = os.path.realpath(os.path.dirname(__file__))
 if not thisdir in sys.path:
     sys.path.append(thisdir)
 
-import wlcg_dbs_interface as interface
+from wlcg_dbs_interface import WLCGInterface
+interface = WLCGInterface()
 wlcg_template= os.path.join("{wlcg_prefix}{wlcg_dir}",
     "{sample_name}",
     "{crab_dirname}",
@@ -135,6 +136,7 @@ def check_crab_directory(
     pbar: Iterable,
     wlcg_dir: str,
     wlcg_prefix: str,
+    time_stamps: set[str],
     job_input_file: str="job_input_files.json",
 ) -> None:
     """Function to check a specific crab base directory in *sample_dir*.
@@ -253,10 +255,9 @@ def check_crab_directory(
     if not time_stamp:
         raise ValueError("Could not retrieve time stamp from status json!")
     time_stamp = time_stamp.split(":")[0]
-
+    time_stamps.add("/".join([crab_dirname, time_stamp]))
     campaign_name = interface.get_campaign_name(
         das_key=das_key,
-        verbosity=verbosity
     )
     this_wlcg_template = wlcg_template.format(
         wlcg_prefix=wlcg_prefix,
@@ -281,7 +282,6 @@ def check_crab_directory(
         job_outputs.update(
             interface.load_remote_output(
                 wlcg_path=os.path.join(this_wlcg_template, f"{i:04d}"),
-                verbosity=verbosity
             )
         )
 
@@ -292,7 +292,6 @@ def check_crab_directory(
         input_map=input_map,
         job_details=job_details,
         state="failed",
-        verbosity=verbosity,
     )
 
     # load information about failed jobs
@@ -302,7 +301,6 @@ def check_crab_directory(
         input_map=input_map,
         job_details=job_details,
         state="finished",
-        verbosity=verbosity,
     )
 
 
@@ -323,7 +321,7 @@ def main(*args,
     """  
     # load the information from the argument parser  
     meta_infos = dict()
-
+    event_comparison = dict()
     # loop through the sample directories containing the crab base directories
     pbar_sampledirs = tqdm(sample_dirs)
     for sample_dir in pbar_sampledirs:
@@ -339,11 +337,10 @@ def main(*args,
         pbar_sampledirs.set_description(f"Checking sample {sample_name}")
         das_key = interface.load_das_key(
             sample_name=sample_name, sample_config=sample_config,
-            verbosity=verbosity
         )
 
         # get full set of lfns for this sample
-        known_lfns=interface.get_dbs_lfns(das_key=das_key, verbosity=verbosity)   
+        known_lfns=interface.get_dbs_lfns(das_key=das_key)   
 
         # if the dbs could not be contacted for some reason, use DAS
         # to load the total number of LFNS
@@ -352,7 +349,7 @@ def main(*args,
         else:
             # get total number of LFNs from DAS
             n_total = interface.get_das_information(
-                das_key=das_key, verbosity=verbosity
+                das_key=das_key
             )
 
         # set up the sets to keep track of the lfns
@@ -360,6 +357,9 @@ def main(*args,
         
         # set of **outputs** from failed jobs, which shouldn't happen
         failed_job_outputs=set()    
+
+        # set of relevant time stamps (needed for later merging of files)
+        time_stamps = set()
 
         # loop through suffices to load the respective crab base directories
         pbar_suffix = tqdm(zip(suffices, status_files))
@@ -376,6 +376,7 @@ def main(*args,
                 wlcg_dir=wlcg_dir,
                 wlcg_prefix=wlcg_prefix,
                 das_key=das_key,
+                time_stamps=time_stamps,
             )
 
         # in the end, all LFNs should be accounted for
@@ -387,6 +388,7 @@ def main(*args,
         sample_dict["done"] = len(done_lfns)
         sample_dict["outputs from failed jobs"] = len(failed_job_outputs)
         sample_dict["missing"] = len(unprocessed_lfns)
+        sample_dict["time_stamps"] = list(time_stamps)
         if dump_filelists:
             sample_dict["total_lfns"] = list(known_lfns.copy())
             sample_dict["done_lfns"] = list(done_lfns.copy())
@@ -422,6 +424,21 @@ def main(*args,
         build_meta_info_table(
             meta_infos={x: meta_infos[x] for x in samples_with_missing_lfns},
             outfilename="samples_with_missing_lfns.json"
+        )
+
+    samples_wo_missing_lfns = list(filter(
+        lambda x: meta_infos[x]["missing"] == 0 or 
+                   ( meta_infos[x]["das_total"] != meta_infos[x]["total"]
+                        and meta_infos[x]["das_total"] != -1
+                    ), 
+        meta_infos
+    ))
+    if len(samples_wo_missing_lfns) != 0:
+        print("\n\n")
+        print("Samples w/o missing LFNS:")
+        build_meta_info_table(
+            meta_infos={x: meta_infos[x] for x in samples_wo_missing_lfns},
+            outfilename="samples_wo_missing_lfns.json"
         )
 
 def build_meta_info_table(
@@ -617,8 +634,10 @@ def parse_arguments():
         help=" ".join(
             """
                 control the verbosity of the output. Currently implemented levels
-                0: just print number of files/outputs for each sample
-                1: actually print the paths for the different files
+                0:  just print number of files/outputs for each sample
+                1:  actually print the paths for the different files
+                2:  actually check the event contents of the outputs w.r.t. the
+                    corresponding LFN content
             """.split()
         )
     )
@@ -635,6 +654,7 @@ def parse_arguments():
     
     global verbosity
     verbosity = args.verbosity
+    interface.verbosity = verbosity
     return args
 
 if __name__ == '__main__':
