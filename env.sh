@@ -32,6 +32,7 @@ action() {
     local os_version=$(cat /etc/os-release | grep VERSION_ID | sed -E 's/VERSION_ID="([0-9]+)"/\1/')
     if [ $os_version = "7" ]; then
         export SCRAM_ARCH=slc7_amd64_gcc10
+	run_cmd source "/cvmfs/grid.cern.ch/centos7-ui-160522/etc/profile.d/setup-c7-ui-python3-example.sh" ""
     else
         export SCRAM_ARCH=el8_amd64_gcc10
     fi
@@ -94,7 +95,7 @@ action() {
     fi
     mkdir -p "$ANALYSIS_DATA_PATH"
     export PATH="$this_dir/soft/CentOS$os_version/bin:$PATH"
-    source /afs/cern.ch/user/m/mrieger/public/law_sw/setup.sh
-    source "$( law completion )"
+#    source /afs/cern.ch/user/m/mrieger/public/law_sw/setup.sh
+#    source "$( law completion )"
 }
 action
