@@ -4,7 +4,7 @@ params:
   skimCfg: skim.yaml
   maxEvents: -1
 splitting: FileBased
-unitsPerJob: 4
+unitsPerJob: 1
 scriptExe: RunKit/nanoProdCrabJob.sh
 outputFiles:
   - nano.root

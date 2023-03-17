@@ -57,7 +57,7 @@ action() {
         run_cmd git clone git@github.com:cms-data/RecoBTag-Combined.git recobtag_data
         # copy model files
         run_cmd mkdir -p Framework/NanoProd/data/ParticleNetAK4/CHS/PNETUL
-        run_cmd cp -r ParticleNetStudiesRun2/TrainingNtupleMakerAK4/data/ParticleNetAK4/CHS/PNETUL/ClassRegQuantileNoJECLost Framework/NanoProd/data/ParticleNetAK4/CHS/PNETUL/
+        run_cmd cp -r ParticleNetStudiesRun2/TrainingNtupleMakerAK4/data/ParticleNetAK4/PNETUL/ClassRegQuantileNoJECLost Framework/NanoProd/data/ParticleNetAK4/CHS/PNETUL/
         run_cmd mkdir -p Framework/NanoProd/data/ParticleNetAK8/Puppi/PNETUL/ClassReg
         run_cmd cp -r ParticleNetStudiesRun2/TrainingNtupleMakerAK8/data/ParticleNetAK8/Puppi/PNETUL/ClassReg/* Framework/NanoProd/data/ParticleNetAK8/Puppi/PNETUL/ClassReg/
         run_cmd mkdir -p Framework/NanoProd/data/ParticleNetAK8/MassRegression/V01
