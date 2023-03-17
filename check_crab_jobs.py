@@ -7,6 +7,7 @@ from tqdm import tqdm
 from itertools import chain
 from collections.abc import Iterable
 from typing import Any
+from subprocess import call
 import numpy as np
 
 thisdir = os.path.realpath(os.path.dirname(__file__))
@@ -260,7 +261,7 @@ def check_crab_directory(
     if not time_stamp:
         raise ValueError("Could not retrieve time stamp from status json!")
     time_stamp = time_stamp.split(":")[0]
-    time_stamps.add("/".join([crab_dirname, time_stamp]))
+    time_stamps.add(time_stamp)
     campaign_name = interface.get_campaign_name(
         das_key=das_key,
     )
@@ -367,6 +368,7 @@ def main(*args,
     status_files=[],
     sample_config=None,
     dump_filelists=False,
+    rm_failed=False,
     **kwargs
 ):
     """main function. Load information provided by the ArgumentParser. Loops
@@ -465,14 +467,30 @@ def main(*args,
         if sum_events:
             sample_dict["sum_events"] = sum_events
         sample_dict["done"] = len(done_lfns)
-        sample_dict["outputs from failed jobs"] = len(failed_job_outputs)
+
+        if rm_failed:
+            # rm_bar = tqdm(failed_job_outputs)
+            # for f in rm_bar:
+                # rm_bar.set_description(f"Deleting file {f}")
+            def chunks(lst, n):
+                """Yield successive n-sized chunks from lst."""
+                for i in range(0, len(lst), n):
+                    yield lst[i:i + n]
+            for c in list(chunks(list(failed_job_outputs), 400)):      
+                cmd = f"gfal-rm {' '.join(c)}"
+                call([cmd], shell=True)
+            failed_job_outputs = set()
+
+        if len(failed_job_outputs) > 0:
+            sample_dict["outputs from failed jobs"] = len(failed_job_outputs)
         sample_dict["missing"] = len(unprocessed_lfns)
         sample_dict["time_stamps"] = list(time_stamps)
         if dump_filelists:
             sample_dict["total_lfns"] = list(known_lfns.copy())
             sample_dict["done_lfns"] = list(done_lfns.copy())
             sample_dict["missing_lfns"] = list(unprocessed_lfns.copy())
-            sample_dict["failed_outputs"] = list(failed_job_outputs.copy())
+            if len(failed_job_outputs) > 0:
+                sample_dict["failed_outputs"] = list(failed_job_outputs.copy())
         meta_infos[sample_name] = sample_dict.copy()
         if sample_event_comparison and len(sample_event_comparison) > 0:
             event_comparison[sample_name] = sample_event_comparison.copy()
@@ -536,7 +554,7 @@ def build_meta_info_table(
         tot = meta_infos[s]["total"]
         done = meta_infos[s]["done"]
         missing = meta_infos[s]["missing"]
-        failed = meta_infos[s]["outputs from failed jobs"]
+        failed = meta_infos[s].get("outputs from failed jobs", 0)
         # create line for table
         lines.append("| {} |".format(" | ".join(
                 ["{: ^16}".format(x) 
@@ -682,6 +700,20 @@ def parse_arguments():
         default=False,
         action="store_true",
         dest="dump_filelists",
+    )
+
+    parser.add_argument(
+        "--rm-failed",
+        help=" ".join(
+            """
+            directly remove job outputs from failed jobs at the remote
+            target location. WARNING: this is not reversible! Please make
+            sure you know what you're doing!
+            """.split()
+        ),
+        default=False,
+        action="store_true",
+        dest="rm_failed",
     )
 
     parser.add_argument(
