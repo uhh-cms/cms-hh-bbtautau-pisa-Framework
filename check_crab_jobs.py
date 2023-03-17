@@ -6,6 +6,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from tqdm import tqdm
 from itertools import chain
 from collections.abc import Iterable
+from typing import Any
 import numpy as np
 
 thisdir = os.path.realpath(os.path.dirname(__file__))
@@ -136,8 +137,12 @@ def check_crab_directory(
     pbar: Iterable,
     wlcg_dir: str,
     wlcg_prefix: str,
+    xrd_prefix: str,
     time_stamps: set[str],
     job_input_file: str="job_input_files.json",
+    event_lookup: dict[str, int] or None=None,
+    event_comparison_container: list[dict[str, Any]] or None=None,
+    **kwargs,
 ) -> None:
     """Function to check a specific crab base directory in *sample_dir*.
     First, the name of the crab base directory (*crab_dir*) is built from
@@ -292,6 +297,8 @@ def check_crab_directory(
         input_map=input_map,
         job_details=job_details,
         state="failed",
+        wlcg_prefix=wlcg_prefix,
+        xrd_prefix=xrd_prefix,
     )
 
     # load information about failed jobs
@@ -301,112 +308,16 @@ def check_crab_directory(
         input_map=input_map,
         job_details=job_details,
         state="finished",
+        event_comparison_container=event_comparison_container,
+        event_lookup=event_lookup,
     )
 
 
-def main(*args,
-    sample_dirs=[],
-    wlcg_dir=None,
-    wlcg_prefix="",
-    suffices=[],
-    status_files=[],
-    sample_config=None,
-    dump_filelists=False,
-    **kwargs
+
+def post_processing(
+    meta_infos: dict[str, Any],
+    event_comparison: dict[str, list[dict[str, Any]]] or None=None
 ):
-    """main function. Load information provided by the ArgumentParser. Loops
-    Thorugh the sample directories provided as *sample_dirs* and the *suffices*
-    to check the individual crab base directories.
-    Finally, check if any lfns are unaccounted for in the list of finished jobs.
-    """  
-    # load the information from the argument parser  
-    meta_infos = dict()
-    event_comparison = dict()
-    # loop through the sample directories containing the crab base directories
-    pbar_sampledirs = tqdm(sample_dirs)
-    for sample_dir in pbar_sampledirs:
-        # if a sample dir does not exist, no need to check it
-        if not os.path.exists(sample_dir):
-            print(f"Directory {sample_dir} does not exist, skipping!")
-            continue
-        sample_dir = sample_dir.strip(os.path.sep)
-
-        # from IPython import embed; embed()
-        # extract the sample name from the sample directory
-        sample_name=os.path.basename(sample_dir)
-        pbar_sampledirs.set_description(f"Checking sample {sample_name}")
-        das_key = interface.load_das_key(
-            sample_name=sample_name, sample_config=sample_config,
-        )
-
-        # get full set of lfns for this sample
-        known_lfns=interface.get_dbs_lfns(das_key=das_key)   
-
-        # if the dbs could not be contacted for some reason, use DAS
-        # to load the total number of LFNS
-        if len(known_lfns) > 0:
-            n_total = len(known_lfns)
-        else:
-            # get total number of LFNs from DAS
-            n_total = interface.get_das_information(
-                das_key=das_key
-            )
-
-        # set up the sets to keep track of the lfns
-        done_lfns=set()     # set of lfns processed by successful jobs
-        
-        # set of **outputs** from failed jobs, which shouldn't happen
-        failed_job_outputs=set()    
-
-        # set of relevant time stamps (needed for later merging of files)
-        time_stamps = set()
-
-        # loop through suffices to load the respective crab base directories
-        pbar_suffix = tqdm(zip(suffices, status_files))
-        for suffix, status_file in pbar_suffix:
-            check_crab_directory(
-                sample_dir=sample_dir,
-                sample_name=sample_name,
-                suffix=suffix,
-                status_file=status_file,
-                known_lfns=known_lfns,
-                done_lfns=done_lfns,
-                failed_job_outputs=failed_job_outputs,
-                pbar=pbar_suffix,
-                wlcg_dir=wlcg_dir,
-                wlcg_prefix=wlcg_prefix,
-                das_key=das_key,
-                time_stamps=time_stamps,
-            )
-
-        # in the end, all LFNs should be accounted for
-        unprocessed_lfns = known_lfns.symmetric_difference(done_lfns)
-
-        sample_dict = dict()
-        sample_dict["das_total"] = n_total
-        sample_dict["total"] = len(known_lfns)
-        sample_dict["done"] = len(done_lfns)
-        sample_dict["outputs from failed jobs"] = len(failed_job_outputs)
-        sample_dict["missing"] = len(unprocessed_lfns)
-        sample_dict["time_stamps"] = list(time_stamps)
-        if dump_filelists:
-            sample_dict["total_lfns"] = list(known_lfns.copy())
-            sample_dict["done_lfns"] = list(done_lfns.copy())
-            sample_dict["missing_lfns"] = list(unprocessed_lfns.copy())
-            sample_dict["failed_outputs"] = list(failed_job_outputs.copy())
-        meta_infos[sample_name] = sample_dict.copy()
-        
-        if verbosity >= 1:
-            if len(failed_job_outputs) != 0:
-                print("WARNING: found job outputs that should not be there")
-                print(f"Sample: {sample_dir}")
-                for f in failed_job_outputs:
-                    print(f)
-            if len(unprocessed_lfns) != 0:
-                print(f"WARNING: following LFNs for sample {sample_dir} were not processed!")
-                for f in unprocessed_lfns:
-                    print(f)
-    
     # do some final sanity check: if we found missing lfns, print them here
     # so the user can do something
     build_meta_info_table(meta_infos=meta_infos)
@@ -440,6 +351,150 @@ def main(*args,
             meta_infos={x: meta_infos[x] for x in samples_wo_missing_lfns},
             outfilename="samples_wo_missing_lfns.json"
         )
+    
+    if event_comparison and len(event_comparison) > 0:
+        # save event comparison
+        with open("event_comparison.json", "w") as f:
+            json.dump(event_comparison, f, indent=4)
+    
+    
+
+def main(*args,
+    sample_dirs=[],
+    # wlcg_dir=None,
+    # wlcg_prefix="",
+    suffices=[],
+    status_files=[],
+    sample_config=None,
+    dump_filelists=False,
+    **kwargs
+):
+    """main function. Load information provided by the ArgumentParser. Loops
+    Thorugh the sample directories provided as *sample_dirs* and the *suffices*
+    to check the individual crab base directories.
+    Finally, check if any lfns are unaccounted for in the list of finished jobs.
+    """  
+    # load the information from the argument parser  
+    meta_infos = dict()
+    event_comparison = dict()
+    # loop through the sample directories containing the crab base directories
+    pbar_sampledirs = tqdm(sample_dirs)
+    for sample_dir in pbar_sampledirs:
+        # if a sample dir does not exist, no need to check it
+        if not os.path.exists(sample_dir):
+            print(f"Directory {sample_dir} does not exist, skipping!")
+            continue
+        sample_dir = sample_dir.strip(os.path.sep)
+
+        # from IPython import embed; embed()
+        # extract the sample name from the sample directory
+        sample_name=os.path.basename(sample_dir)
+        pbar_sampledirs.set_description(f"Checking sample {sample_name}")
+        das_key = interface.load_das_key(
+            sample_name=sample_name, sample_config=sample_config,
+        )
+
+        # get full set of lfns for this sample
+
+        # if verbosity is >= 2, we perform an event comparison, 
+        # so create lookup map accordingly
+        event_lookup = None
+        # container for event comparisons
+        sample_event_comparison = None
+        sum_events = None
+        if verbosity >= 1:
+            event_lookup = interface.create_event_lookup(das_key=das_key)
+            # the list of lfns is now the list of keys
+            known_lfns = set(event_lookup.keys())
+            sum_events = sum(event_lookup.values())
+            if verbosity >= 2:
+                sample_event_comparison = list()
+            else:
+                event_lookup = None
+        else:
+            # otherwise, there is no need to look up the events, so just 
+            # create the set of lfns directly
+            known_lfns=interface.get_dbs_lfns(das_key=das_key)   
+
+        # if the dbs could not be contacted for some reason, use DAS
+        # to load the total number of LFNS
+        if len(known_lfns) > 0:
+            n_total = len(known_lfns)
+        else:
+            # get total number of LFNs from DAS
+            n_total = interface.get_das_information(
+                das_key=das_key
+            )
+
+        # set up the sets to keep track of the lfns
+        done_lfns=set()     # set of lfns processed by successful jobs
+        
+        # set of **outputs** from failed jobs, which shouldn't happen
+        failed_job_outputs=set()    
+
+        # set of relevant time stamps (needed for later merging of files)
+        time_stamps = set()
+
+        
+
+        # loop through suffices to load the respective crab base directories
+        pbar_suffix = tqdm(zip(suffices, status_files))
+        for suffix, status_file in pbar_suffix:
+            check_crab_directory(
+                sample_dir=sample_dir,
+                sample_name=sample_name,
+                suffix=suffix,
+                status_file=status_file,
+                known_lfns=known_lfns,
+                done_lfns=done_lfns,
+                failed_job_outputs=failed_job_outputs,
+                pbar=pbar_suffix,
+                das_key=das_key,
+                time_stamps=time_stamps,
+                event_comparison_container=sample_event_comparison,
+                event_lookup=event_lookup,
+                **kwargs,
+            )
+
+        # in the end, all LFNs should be accounted for
+        unprocessed_lfns = known_lfns.symmetric_difference(done_lfns)
+
+        sample_dict = dict()
+        sample_dict["das_total"] = n_total
+        sample_dict["total"] = len(known_lfns)
+        if sum_events:
+            sample_dict["sum_events"] = sum_events
+        sample_dict["done"] = len(done_lfns)
+        sample_dict["outputs from failed jobs"] = len(failed_job_outputs)
+        sample_dict["missing"] = len(unprocessed_lfns)
+        sample_dict["time_stamps"] = list(time_stamps)
+        if dump_filelists:
+            sample_dict["total_lfns"] = list(known_lfns.copy())
+            sample_dict["done_lfns"] = list(done_lfns.copy())
+            sample_dict["missing_lfns"] = list(unprocessed_lfns.copy())
+            sample_dict["failed_outputs"] = list(failed_job_outputs.copy())
+        meta_infos[sample_name] = sample_dict.copy()
+        if sample_event_comparison and len(sample_event_comparison) > 0:
+            event_comparison[sample_name] = sample_event_comparison.copy()
+        elif len(unprocessed_lfns) == 0 and len(failed_job_outputs) > 0:
+            # if the event comparison contains nothing, it might indicate
+            # that we actually processed all events.
+            # We could then consider to delete the job outputs that were 
+            # generated from failed jobs
+            pass
+        
+        if verbosity >= 3:
+            if len(failed_job_outputs) != 0:
+                print("WARNING: found job outputs that should not be there")
+                print(f"Sample: {sample_dir}")
+                for f in failed_job_outputs:
+                    print(f)
+            if len(unprocessed_lfns) != 0:
+                print(f"WARNING: following LFNs for sample {sample_dir} were not processed!")
+                for f in unprocessed_lfns:
+                    print(f)
+    
+    post_processing(meta_infos=meta_infos, event_comparison=event_comparison)
 
 def build_meta_info_table(
     meta_infos: dict,
@@ -561,6 +616,19 @@ def parse_arguments():
         dest="wlcg_prefix"
     )
     parser.add_argument(
+        "--xrd-prefix",
+        help=" ".join(
+            """
+                Prefix to contact the directory at the remote site via XROOTD.
+                Defaults to prefix for T2_DESY 
+                (root://dcache-cms-xrootd.desy.de:1094)
+            """.split()
+        ),
+        type=str,
+        default="root://dcache-cms-xrootd.desy.de:1094",
+        dest="xrd_prefix"
+    )
+    parser.add_argument(
         "-s", "--suffices",
         help=" ".join("""
             specify the suffices you would like for the check of the crab
@@ -635,9 +703,10 @@ def parse_arguments():
             """
                 control the verbosity of the output. Currently implemented levels
                 0:  just print number of files/outputs for each sample
-                1:  actually print the paths for the different files
                 2:  actually check the event contents of the outputs w.r.t. the
                     corresponding LFN content
+                3:  actually print the paths for the different files
+
             """.split()
         )
     )

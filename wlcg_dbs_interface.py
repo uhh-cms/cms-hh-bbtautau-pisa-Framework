@@ -2,6 +2,8 @@ import os
 import sys
 import yaml
 import json
+import uproot as up
+import numpy as np
 
 try:
     import gfal2
@@ -114,7 +116,23 @@ class WLCGInterface(object):
             print(f"unable to load files from {wlcg_path}, skipping")
         return []
 
-# def load_events()
+    def load_events_from_file(self, remote_file: str, treename: str="Events"):
+        try:
+            from IPython import embed; embed()
+            f = up.open({remote_file: treename})
+            
+            return f.num_entries
+        except OSError as oserror:
+            print(oserror)
+            print("open IPython shell for debugging")
+            from IPython import embed; embed()
+        return 0
+
+    def load_events(self, remote_files: set[str], treename: str="Events"):
+        return np.sum([
+            self.load_events_from_file(remote_file=path, treename=treename) 
+            for path in remote_files
+        ])
 
     def compare_events(
         self,
@@ -123,7 +141,9 @@ class WLCGInterface(object):
         input_map,
         event_lookup,
     ):
+        event_comparison = list()
         pbar_ids = tqdm(relevant_ids)
+        
         for id in pbar_ids:
             pbar_ids.set_description(f"Comparing events for job {id}")
             relevant_job_outputs = set()
@@ -133,6 +153,19 @@ class WLCGInterface(object):
                 ))
             all_events = sum([event_lookup.get(x, 0) for x in input_map[id]])
 
+            job_events = self.load_events(remote_files=relevant_job_outputs)
+
+            if all_events != job_events:
+                rel_diff = (all_events-job_events)/all_events if not all_events == 0 else 0
+
+                event_comparison.append({
+                    "lfns": input_map[id],
+                    "all_events": all_events,
+                    "saved_events": job_events,
+                    "rel_diff": rel_diff,
+                })
+        return event_comparison
+
 
     def check_job_outputs(
         self,
@@ -141,7 +174,10 @@ class WLCGInterface(object):
         job_details: dict[str, dict],
         state: str="failed",
         job_outputs: set or None=None,
+        wlcg_prefix: str="",
+        xrd_prefix: str="",
         event_lookup: dict or None=None,
+        event_comparison_container: list or None=None,
         verbosity: int=0,
     ) -> None:
         """Function to collect information about jobs in *job_details*.
@@ -177,6 +213,7 @@ class WLCGInterface(object):
             ValueError: If a lfn is already marked as done but is associated with
                         a done job again, the ValueError is raised.
         """
+
         relevant_ids = set(filter(
             lambda x: job_details[x]["State"] == state,
             job_details
@@ -200,14 +237,20 @@ class WLCGInterface(object):
         # available)
         elif state == "finished":
             
-            lfns = set()
+            lfns = set(chain.from_iterable([input_map[x] for x in relevant_ids]))
             
             # first check if a lfn is already marked as done - this should not happen
             
             if event_lookup:
-                self.compare_events()
-            else:
-                lfns = set(chain.from_iterable([input_map[x] for x in relevant_ids]))
+                # all following steps use XROOTD to contact specific remote files, 
+                # so update prefix accordingly
+                event_comparison_container += self.compare_events(
+                    relevant_ids=relevant_ids,
+                    job_outputs=set([x.replace(wlcg_prefix, xrd_prefix) for x in job_outputs]),
+                    input_map=input_map,
+                    event_lookup=event_lookup
+                )
+                
             overlap = collector_set.intersection(lfns)
             if len(overlap) != 0:
                 if verbosity == 0:
