@@ -359,7 +359,6 @@ GluGluToRadionToHHTo2B2Tau_M-1250:
   - '230119_164627'
 
 
-
 GluGluToRadionToHHTo2B2Tau_M-1500:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-1500_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: bogdan_v2
@@ -367,14 +366,11 @@ GluGluToRadionToHHTo2B2Tau_M-1500:
   timestamps:
   - '230119_164648'
 
-
-
 GluGluToRadionToHHTo2B2Tau_M-1750:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-1750_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: bogdan_v2
   sampleType: mc
   timestamps: []
-
 
 
 GluGluToRadionToHHTo2B2Tau_M-2000:
@@ -385,14 +381,12 @@ GluGluToRadionToHHTo2B2Tau_M-2000:
   - '221221_163442'
 
 
-
 GluGluToRadionToHHTo2B2Tau_M-250:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-250_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: bogdan_v2
   sampleType: mc
   timestamps:
   - '230119_164708'
-
 
 
 GluGluToRadionToHHTo2B2Tau_M-2500:
@@ -403,14 +397,12 @@ GluGluToRadionToHHTo2B2Tau_M-2500:
   - '230120_173404'
 
 
-
 GluGluToRadionToHHTo2B2Tau_M-260:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-260_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: bogdan_v2
   sampleType: mc
   timestamps:
   - '230119_164728'
-
 
 
 GluGluToRadionToHHTo2B2Tau_M-270:
@@ -422,14 +414,12 @@ GluGluToRadionToHHTo2B2Tau_M-270:
   - '230320_152847'
 
 
-
 GluGluToRadionToHHTo2B2Tau_M-280:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-280_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: bogdan_v2
   sampleType: mc
   timestamps:
   - '230119_164813'
-
 
 
 GluGluToRadionToHHTo2B2Tau_M-300:
@@ -441,7 +431,6 @@ GluGluToRadionToHHTo2B2Tau_M-300:
   - '230213_152121'
 
 
-
 GluGluToRadionToHHTo2B2Tau_M-3000:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-3000_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: bogdan_v2
@@ -450,14 +439,12 @@ GluGluToRadionToHHTo2B2Tau_M-3000:
   - '230119_164853'
 
 
-
 GluGluToRadionToHHTo2B2Tau_M-320:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-320_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: bogdan_v2
   sampleType: mc
   timestamps:
   - '230213_173124'
-
 
 
 GluGluToRadionToHHTo2B2Tau_M-350:
@@ -473,7 +460,7 @@ GluGluToRadionToHHTo2B2Tau_M-400:
   remoteBase: bogdan_v2
   sampleType: mc
   timestamps:
-- '230317_135206'
+  - '230317_135206'
 
 
 GluGluToRadionToHHTo2B2Tau_M-450:
@@ -485,14 +472,12 @@ GluGluToRadionToHHTo2B2Tau_M-450:
   - '230213_152211'
 
 
-
 GluGluToRadionToHHTo2B2Tau_M-500:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-500_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: bogdan_v2
   sampleType: mc
   timestamps:
   - '230227_125959'
-
 
 
 GluGluToRadionToHHTo2B2Tau_M-550:
