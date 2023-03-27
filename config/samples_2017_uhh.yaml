@@ -374,7 +374,10 @@ GluGluToRadionToHHTo2B2Tau_M-1750:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-1750_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: bogdan_v2
   sampleType: mc
-  timestamps: []
+  timestamps:
+  - '230317_135225'
+  - []
+  - '230327_085432'
 
 
 GluGluToRadionToHHTo2B2Tau_M-2000:
