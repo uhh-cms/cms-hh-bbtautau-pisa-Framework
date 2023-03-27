@@ -1,3 +1,11 @@
+GLOBAL:
+  era: Run2_2017
+  nanoVersion: v11
+  remoteBases:
+    bogdan_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/bwieders/crab_nano_v11_v2
+    philip_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/pkeicher/crab_nano_v11_v2
+
+
 DYJetsToLL_0J_amcatnloFXFX:
   miniAOD: /DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: philip_v2
@@ -5,6 +13,7 @@ DYJetsToLL_0J_amcatnloFXFX:
   timestamps:
   - '221221_163309'
   - '230119_171959'
+
 
 DYJetsToLL_1J_amcatnloFXFX:
   miniAOD: /DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -14,6 +23,7 @@ DYJetsToLL_1J_amcatnloFXFX:
   - '221221_163336'
   - '230117_081308'
   - '230124_075130'
+
 
 DYJetsToLL_2J_amcatnloFXFX:
   miniAOD: /DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
@@ -72,7 +82,6 @@ DYJetsToLL_LHEFilterPtZ-50To100:
   - '230214_152234'
 
 
-
 DYJetsToLL_LHEFilterPtZ-650ToInf:
   miniAOD: /DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: philip_v2
@@ -115,14 +124,6 @@ EWKZ2Jets_ZToLL_M-50:
   - '221221_163811'
   - '230119_172405'
   - '230124_150409'
-
-
-GLOBAL:
-  era: Run2_2017
-  nanoVersion: v11
-  remoteBases:
-    bogdan_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/bwieders/crab_nano_v11_v2
-    philip_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/pkeicher/crab_nano_v11_v2
 
 
 GluGluHToTauTau:
@@ -369,6 +370,7 @@ GluGluToRadionToHHTo2B2Tau_M-1500:
   sampleType: mc
   timestamps:
   - '230119_164648'
+
 
 GluGluToRadionToHHTo2B2Tau_M-1750:
   miniAOD: /GluGluToRadionToHHTo2B2Tau_M-1750_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -1181,7 +1183,8 @@ VBFToRadionToHHTo2B2Tau_M-500:
   miniAOD: /VBFToRadionToHHTo2B2Tau_M-500_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: bogdan_v2
   sampleType: mc
-  timestamps: []
+  timestamps:
+  - '230317_135346'
 
 
 VBFToRadionToHHTo2B2Tau_M-550:
