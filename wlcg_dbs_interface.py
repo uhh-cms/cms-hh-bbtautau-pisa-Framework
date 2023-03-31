@@ -40,6 +40,12 @@ class WLCGInterface(object):
             print(e)
             self.gfal_context = None
         self.dbs_api = self.setup_dbs_api()
+        self.xrtd_redirectors = [
+            "cms-xrd-global.cern.ch",
+            "xrootd-cms.infn.it",
+            "cmsxrootd.fnal.gov",
+            "xrootd-cms.infn.it"
+        ]
 
 
     @property
@@ -72,18 +78,55 @@ class WLCGInterface(object):
         self,
         filepath:str ,
         target: str,
-        route_url: str="root://cms-xrd-global.cern.ch",
+        # route_url: str="root://cms-xrd-global.cern.ch",
+        enforce_success: bool=False,
     ):  
-        url=f"{route_url}//{filepath}"
         target = os.path.abspath(target)
+        for route_url in self.xrtd_redirectors:
+            url=f"root://{route_url}//{filepath}"
 
-        # copy remote file
+            # copy remote file
+            try:
+                self.gfal_context.filecopy(
+                    self.gfal_context.transfer_parameters(),
+                    url,
+                    f"file://{target}"
+                )
+                break
+            except Exception as e:
+                print(e)
+
+        if enforce_success and not os.path.exists(target):
+            raise ValueError(f"Unable to copy file '{url}' to '{target}'")
+
+    def move_file_to_remote(
+        self,
+        local_file: str,
+        target_file: str,
+        route_url: str="root://cms-xrd-global.cern.ch",
+        cleanup: bool=False,
+    ):
+        local_file_path = f"file://{os.path.abspath(local_file)}"
+        target_dir = os.path.dirname(target_file)
+
+        if route_url != None:
+            remote_url = f"{route_url}//{target_file}"
+            wlcg_target_dir = f"{route_url}//{target_dir}"
+
+        else:
+            remote_url = target_file
+            wlcg_target_dir = target_dir
+
+        self.gfal_context.mkdir_rec(wlcg_target_dir, 0)
+
         self.gfal_context.filecopy(
             self.gfal_context.transfer_parameters(),
-            url,
-            f"file://{target}"
+            local_file_path,
+            remote_url
         )
 
+        if cleanup:
+            os.remove(local_file)
 
     def load_remote_output(
         self,
