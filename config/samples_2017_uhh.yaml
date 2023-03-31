@@ -36,7 +36,7 @@ DYJetsToLL_LHEFilterPtZ-100To250:
   - '230130_142724'
   - '230206_085004'
   - '230213_111054'
-  - '230331_150132'
+  - '230331_211449'
 DYJetsToLL_LHEFilterPtZ-250To400:
   miniAOD: /DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: philip_v2
@@ -66,7 +66,7 @@ DYJetsToLL_LHEFilterPtZ-650ToInf:
   timestamps:
   - '221221_163631'
   - '230117_081457'
-  - '230331_134406'
+  - '230331_195640'
 DYJetsToLL_M-50_amcatnloFXFX:
   miniAOD: /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: philip_v2
@@ -75,7 +75,7 @@ DYJetsToLL_M-50_amcatnloFXFX:
   - '221221_163656'
   - '230113_122913'
   - '230123_080852'
-  - '230331_134406'
+  - '230331_195640'
 EWKWMinus2Jets_WToLNu_M-50:
   miniAOD: /EWKWMinus2Jets_WToLNu_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: philip_v2
@@ -564,7 +564,7 @@ TTToHadronic:
   - '221221_163901'
   - '230119_172501'
   - '230125_140626'
-  - '230331_134406'
+  - '230331_195640'
 TTToSemiLeptonic:
   miniAOD: /TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
@@ -585,7 +585,9 @@ TTWJetsToQQ:
   miniAOD: /TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
   sampleType: mc
-  timestamps: []
+  timestamps:
+  - '230321_093550'
+  - '230331_212746'
 TTWW:
   miniAOD: /TTWW_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
@@ -598,7 +600,8 @@ TTWZ:
   miniAOD: /TTWZ_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
   sampleType: mc
-  timestamps: []
+  timestamps:
+  - '230321_093614'
 TTZToLLNuNu:
   miniAOD: /TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
@@ -607,7 +610,7 @@ TTZToLLNuNu:
   - []
   - '230113_123455'
   - '230123_081437'
-  - '230331_134406'
+  - '230331_195640'
 TTZZ:
   miniAOD: /TTZZ_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
@@ -649,7 +652,8 @@ VBFHToTauTau:
   remoteBase: philip_v2
   sampleType: mc
   timestamps:
-  - []
+  - '230321_093637'
+  - '230327_121625'
 VBFToBulkGravitonToHHTo2B2Tau_M-1000:
   miniAOD: /VBFToBulkGravitonToHHTo2B2Tau_M-1000_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: bogdan_v2
@@ -1025,7 +1029,7 @@ WJetsToLNu_HT-800To1200:
   - '221221_164453'
   - '230117_081938'
   - '230124_075440'
-  - '230331_134406'
+  - '230331_195640'
 WW:
   miniAOD: /WW_TuneCP5_13TeV-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
@@ -1114,7 +1118,7 @@ ZZZ:
   - '221221_164541'
   - '230117_082003'
   - '230124_075504'
-  - '230331_134406'
+  - '230331_195640'
 ggZH_HToBB_ZToLL:
   miniAOD: /ggZH_HToBB_ZToLL_M-125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
