@@ -261,7 +261,6 @@ def check_crab_directory(
     if not time_stamp:
         raise ValueError("Could not retrieve time stamp from status json!")
     time_stamp = time_stamp.split(":")[0]
-    time_stamps.append(time_stamp)
     campaign_name = interface.get_campaign_name(
         das_key=das_key,
     )
@@ -302,7 +301,8 @@ def check_crab_directory(
         xrd_prefix=xrd_prefix,
     )
 
-    # load information about failed jobs
+    # load information about finished jobs
+    ndone = len(done_lfns)
     interface.check_job_outputs(
         job_outputs=job_outputs,
         collector_set=done_lfns,
@@ -313,7 +313,10 @@ def check_crab_directory(
         event_lookup=event_lookup,
     )
 
-
+    if ndone< len(done_lfns):
+        time_stamps.append(time_stamp)
+    else:
+        time_stamps.append([])
 
 def post_processing(
     meta_infos: dict[str, Any],
@@ -369,6 +372,7 @@ def main(*args,
     sample_config=None,
     dump_filelists=False,
     rm_failed=False,
+    local_job_summary=None,
     **kwargs
 ):
     """main function. Load information provided by the ArgumentParser. Loops
@@ -379,6 +383,11 @@ def main(*args,
     # load the information from the argument parser  
     meta_infos = dict()
     event_comparison = dict()
+
+    local_job_summary_dict = dict()
+    if local_job_summary:
+        with open(local_job_summary) as f:
+            local_job_summary_dict = json.load(f)
     # loop through the sample directories containing the crab base directories
     pbar_sampledirs = tqdm(sample_dirs)
     for sample_dir in pbar_sampledirs:
@@ -457,6 +466,11 @@ def main(*args,
                 event_lookup=event_lookup,
                 **kwargs,
             )
+        
+        local_job_infos = local_job_summary_dict.get(sample_name)
+        if local_job_infos:
+            done_lfns.update(local_job_infos["lfns"])
+            time_stamps.append(local_job_infos["timestamp"])
 
         # in the end, all LFNs should be accounted for
         unprocessed_lfns = known_lfns.symmetric_difference(done_lfns)
@@ -741,6 +755,19 @@ def parse_arguments():
 
             """.split()
         )
+    )
+
+
+    parser.add_argument("-l", "--local-job-summary",
+        help=" ".join(
+            """
+            path to summary files about locally run jobs
+            """.split()
+        ),
+        metavar="path/to/summary_for_local_jobs.json",
+        # nargs="+",
+        type=str,
+        dest="local_job_summary"
     )
 
     args = parser.parse_args()
