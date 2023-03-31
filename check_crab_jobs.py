@@ -139,7 +139,7 @@ def check_crab_directory(
     wlcg_dir: str,
     wlcg_prefix: str,
     xrd_prefix: str,
-    time_stamps: set[str],
+    time_stamps: list[str],
     job_input_file: str="job_input_files.json",
     event_lookup: dict[str, int] or None=None,
     event_comparison_container: list[dict[str, Any]] or None=None,
@@ -261,7 +261,7 @@ def check_crab_directory(
     if not time_stamp:
         raise ValueError("Could not retrieve time stamp from status json!")
     time_stamp = time_stamp.split(":")[0]
-    time_stamps.add(time_stamp)
+    time_stamps.append(time_stamp)
     campaign_name = interface.get_campaign_name(
         das_key=das_key,
     )
@@ -435,7 +435,7 @@ def main(*args,
         failed_job_outputs=set()    
 
         # set of relevant time stamps (needed for later merging of files)
-        time_stamps = set()
+        time_stamps = list()
 
         
 
@@ -484,7 +484,7 @@ def main(*args,
         if len(failed_job_outputs) > 0:
             sample_dict["outputs from failed jobs"] = len(failed_job_outputs)
         sample_dict["missing"] = len(unprocessed_lfns)
-        sample_dict["time_stamps"] = list(time_stamps)
+        sample_dict["time_stamps"] = time_stamps.copy()
         if dump_filelists:
             sample_dict["total_lfns"] = list(known_lfns.copy())
             sample_dict["done_lfns"] = list(done_lfns.copy())
