@@ -29,7 +29,12 @@ action() {
     # source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_101 x86_64-centos7-gcc8-opt
     # conda activate bbtt
 
-    local os_version=$(cat /etc/os-release | grep VERSION_ID | sed -E 's/VERSION_ID="([0-9]+)"/\1/')
+    local os_version=$(cat /etc/os-release | grep VERSION_ID | sed -E 's/VERSION_ID="([0-9].[0-9]+)"/\1/')
+    # workaround if above expression doesn't work correctly
+    if [[ $os_version == "VERSION"* ]]; then
+        os_version=$(cat /etc/os-release | grep VERSION_ID | sed -E 's/VERSION_ID="([0-9]+)"/\1/')
+    fi
+    os_version=${os_version:0:1}
     if [ $os_version = "7" ]; then
         export SCRAM_ARCH=slc7_amd64_gcc10
 	run_cmd source "/cvmfs/grid.cern.ch/centos7-ui-160522/etc/profile.d/setup-c7-ui-python3-example.sh" ""
