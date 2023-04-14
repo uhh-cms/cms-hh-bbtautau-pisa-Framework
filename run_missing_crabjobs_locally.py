@@ -55,19 +55,21 @@ def run_job(
 
     local_lfn_name = os.path.basename(lfn)
     # copy lfn locally
-    interface.get_remote_file(
-        filepath=lfn,
-        target=local_lfn_name
-    )
     if not os.path.exists(local_lfn_name):
-        msg = f"Unable to load '{lfn}'"
-        if fail_on_exception:
-            raise ValueError(msg)
-        else:
-            print(msg)
-            os.chdir(cwd)
-            return
+        interface.get_remote_file(
+            filepath=lfn,
+            target=local_lfn_name
+        )
+        if not os.path.exists(local_lfn_name):
+            msg = f"Unable to load '{lfn}'"
+            if fail_on_exception:
+                raise ValueError(msg)
+            else:
+                print(msg)
+                os.chdir(cwd)
+                return
 
+    final_output = os.path.abspath("nano.root")
     # run the job with this LFN
     run_custom_nano_command(
         input_file=local_lfn_name,
@@ -76,7 +78,7 @@ def run_job(
     # copy the output to the (remote) WLCG site
     # from IPython import embed; embed()
     interface.move_file_to_remote(
-        local_file=os.path.abspath("nano.root"),
+        local_file=final_output,
         target_file=f"{wlcg_path}/{output_name}",
         route_url=None
     )
@@ -116,7 +118,7 @@ def main(
     sample_config: str,
     veto_dirs: list[str]=None,
     tmp_dir: str="./tmp",
-    remote_dir: str="manual_jobs",
+    remote_dir_suffix: str="recovery_3",
     **kwargs,
 ):
     if not veto_dirs:
@@ -151,6 +153,10 @@ def main(
         # loop through the list of missing lfns
         pbar_missing_lfns = tqdm(missing_lfn_dict[sample]["missing_lfns"])
         missing_lfns = list()
+        final_remote_dir = (f"crab_{sample}_{remote_dir_suffix}" 
+                            if not remote_dir_suffix == ""
+                            else f"crab_{sample}"
+                        )
         for i, lfn in enumerate(pbar_missing_lfns):
             lfn_shortname = "/".join(lfn.split("/")[-3:])
             pbar_missing_lfns.set_description(f"Running LFN {lfn_shortname}")
@@ -160,7 +166,7 @@ def main(
                 wlcg_prefix=wlcg_prefix,
                 wlcg_dir=wlcg_dir,
                 sample_name=sample_campaign,
-                crab_dirname=remote_dir,
+                crab_dirname=final_remote_dir,
                 time_stamp=timestamp,
                 job_output=f"{blocknumber:04d}"
             )
@@ -173,7 +179,7 @@ def main(
             missing_lfns.append(lfn)
         local_job_summary[sample] = {
             "timestamp": timestamp,
-            "remote_dir": remote_dir,
+            "remote_dir": final_remote_dir,
             "lfns": missing_lfns,
         }
     with open("local_job_summary.json", "w") as f:
@@ -242,19 +248,19 @@ def parse_arguments():
     )
     
     parser.add_argument(
-        "-r", "--remote-dir",
+        "-r", "--remote-dir-suffix",
         help=" ".join(
             """
                 safe the output of the jobs you run locally in this
                 directory in the (remote) WLCG site. The path on the remote
                 site is formed as 
-                '{wlcg-dir}/{sample_campaign}/{remote-dir}/{time-stamp}'.
-                Defaults to 'manual_jobs'
+                '{wlcg-dir}/{sample_campaign}/crab_{sample_name}_{remote-dir-suffix}/{time-stamp}'.
+                Defaults to 'recovery_3'
             """.split()
         ),
         type=str,
-        default="manual_jobs",
-        dest="remote_dir",
+        default="recovery_3",
+        dest="remote_dir_suffix",
     )
 
     parser.add_argument(
@@ -313,7 +319,7 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "veto_dirs",
+        "--veto-dirs",
         help=" ".join(
             """
                 veto samples in the missing files json that are accounted
@@ -321,7 +327,9 @@ def parse_arguments():
             """.split()
         ),
         metavar="path/to/crab_dirs",
-        nargs="+"
+        nargs="+",
+        required=False,
+        dest="veto_dirs"
     )
 
     args = parser.parse_args()
