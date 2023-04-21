@@ -20,7 +20,7 @@ verbosity = 0
 
 def run_custom_nano_command(
     input_file: str,
-    nevents: int=100,
+    nevents: int=-1,
     era: str="Run2_2017"
 ):
     # first build the cms PSet
