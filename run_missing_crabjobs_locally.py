@@ -12,7 +12,9 @@ thisdir = os.path.realpath(os.path.dirname(__file__))
 if not thisdir in sys.path:
     sys.path.append(thisdir)
 
-import wlcg_dbs_interface as interface
+from wlcg_dbs_interface import WLCGInterface
+
+interface = WLCGInterface()
 
 verbosity = 0
 
@@ -42,6 +44,7 @@ def run_job(
     tmp_dir: str,
     wlcg_path:str,
     output_name:str,
+    fail_on_exception: bool=False,
     **kwargs,
 ):
     # cd into tmp dir. If it doesn't exist, create it
@@ -50,21 +53,35 @@ def run_job(
     cwd = os.getcwd()
     os.chdir(tmp_dir)
 
+    local_lfn_name = os.path.basename(lfn)
     # copy lfn locally
-    interface.get_remote_file(
-        filepath=lfn,
-        target=output_name
-    )
-    if not os.path.exists(output_name):
-        raise ValueError(f"Unable to load '{lfn}'")
+    if not os.path.exists(local_lfn_name):
+        interface.get_remote_file(
+            filepath=lfn,
+            target=local_lfn_name
+        )
+        if not os.path.exists(local_lfn_name):
+            msg = f"Unable to load '{lfn}'"
+            if fail_on_exception:
+                raise ValueError(msg)
+            else:
+                print(msg)
+                os.chdir(cwd)
+                return
 
+    final_output = os.path.abspath("nano.root")
     # run the job with this LFN
     run_custom_nano_command(
-        input_file=output_name,
+        input_file=local_lfn_name,
 
     )
     # copy the output to the (remote) WLCG site
-    from IPython import embed; embed()
+    # from IPython import embed; embed()
+    interface.move_file_to_remote(
+        local_file=final_output,
+        target_file=f"{wlcg_path}/{output_name}",
+        route_url=None
+    )
 
     # change back to the original directory after we're done
     os.chdir(cwd)
@@ -101,7 +118,7 @@ def main(
     sample_config: str,
     veto_dirs: list[str]=None,
     tmp_dir: str="./tmp",
-    remote_dir: str="manual_jobs",
+    remote_dir_suffix: str="recovery_3",
     **kwargs,
 ):
     if not veto_dirs:
@@ -113,13 +130,14 @@ def main(
     
     # filter out samples that are accounted for in the list of veto directories
     missing_samples = list(filter(
-        lambda x: not any(dir.endswith(x) for dir in veto_dirs),
+        lambda x: not any(dir.strip("/").endswith(x) for dir in veto_dirs),
         missing_lfn_dict
     ))
+    # from IPython import embed; embed()
     pbar_samples = tqdm(missing_samples)
     # create a time stamp that mimics the crab format
     timestamp = '{:%y%m%d_%H%M%S}'.format(datetime.now())
-
+    local_job_summary = dict()
     for sample in pbar_samples:
         pbar_samples.set_description(f"Run missing jobs for sample '{sample}'")
 
@@ -134,23 +152,38 @@ def main(
         
         # loop through the list of missing lfns
         pbar_missing_lfns = tqdm(missing_lfn_dict[sample]["missing_lfns"])
-        pbar_missing_lfns.set_description("Running LFN")
+        missing_lfns = list()
+        final_remote_dir = (f"crab_{sample}_{remote_dir_suffix}" 
+                            if not remote_dir_suffix == ""
+                            else f"crab_{sample}"
+                        )
         for i, lfn in enumerate(pbar_missing_lfns):
+            lfn_shortname = "/".join(lfn.split("/")[-3:])
+            pbar_missing_lfns.set_description(f"Running LFN {lfn_shortname}")
+
+            blocknumber = int(i/10000)
             wlcg_path = build_wlcg_path(
                 wlcg_prefix=wlcg_prefix,
                 wlcg_dir=wlcg_dir,
                 sample_name=sample_campaign,
-                crab_dirname=remote_dir,
+                crab_dirname=final_remote_dir,
                 time_stamp=timestamp,
-                job_output=f"{i:04d}"
+                job_output=f"{blocknumber:04d}"
             )
             run_job(
                 lfn=lfn,
-                tmp_dir=tmp_dir,
+                tmp_dir=os.path.join(tmp_dir, sample),
                 wlcg_path=wlcg_path,
                 output_name=f"nano_{i}.root",
             )
-    
+            missing_lfns.append(lfn)
+        local_job_summary[sample] = {
+            "timestamp": timestamp,
+            "remote_dir": final_remote_dir,
+            "lfns": missing_lfns,
+        }
+    with open("local_job_summary.json", "w") as f:
+        json.dump(local_job_summary, f, indent=4)
 
 def parse_arguments():
     description = """
@@ -215,18 +248,19 @@ def parse_arguments():
     )
     
     parser.add_argument(
-        "-r", "--remote-dir",
+        "-r", "--remote-dir-suffix",
         help=" ".join(
             """
                 safe the output of the jobs you run locally in this
                 directory in the (remote) WLCG site. The path on the remote
                 site is formed as 
-                '{wlcg-dir}/{sample_campaign}/{remote-dir}/{time-stamp}'
+                '{wlcg-dir}/{sample_campaign}/crab_{sample_name}_{remote-dir-suffix}/{time-stamp}'.
+                Defaults to 'recovery_3'
             """.split()
         ),
         type=str,
-        default="manual_jobs",
-        dest="remote_dir",
+        default="recovery_3",
+        dest="remote_dir_suffix",
     )
 
     parser.add_argument(
@@ -285,7 +319,7 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "veto-directories",
+        "--veto-dirs",
         help=" ".join(
             """
                 veto samples in the missing files json that are accounted
@@ -293,11 +327,13 @@ def parse_arguments():
             """.split()
         ),
         metavar="path/to/crab_dirs",
-        nargs="+"
-        # dest="veto_dirs"
+        nargs="+",
+        required=False,
+        dest="veto_dirs"
     )
 
     args = parser.parse_args()
+    # from IPython import embed; embed()
     
     if not os.path.exists(args.sample_config):
         parser.error(f"file {args.sample_config} does not exist!")
