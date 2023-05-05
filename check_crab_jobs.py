@@ -277,7 +277,6 @@ def check_crab_directory(
     
     # get maximum ID to identify maximum block number later
     max_jobid = np.max([int(x) for x in job_details.keys()])
-    # from IPython import embed; embed()
     # initialize set of outputs
     job_outputs = set()
     # get the maximum block number and iterate through the blocks
@@ -404,7 +403,6 @@ def main(*args,
         das_key = interface.load_das_key(
             sample_name=sample_name, sample_config=sample_config,
         )
-
         # get full set of lfns for this sample
 
         # if verbosity is >= 2, we perform an event comparison, 
