@@ -64,18 +64,15 @@ DYJetsToLL_LHEFilterPtZ-650ToInf:
   remoteBase: philip_v2
   sampleType: mc
   timestamps:
-  - '221221_163631'
-  - '230117_081457'
-  - '230331_195640'
+  - '230331_201628'
 DYJetsToLL_M-50_amcatnloFXFX:
   miniAOD: /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: philip_v2
   sampleType: mc
   timestamps:
-  - '221221_163656'
-  - '230113_122913'
-  - '230123_080852'
-  - '230331_195640'
+  - '230331_201705'
+  - '230412_070032'
+  - '230417_073448'
 EWKWMinus2Jets_WToLNu_M-50:
   miniAOD: /EWKWMinus2Jets_WToLNu_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: philip_v2
@@ -477,16 +474,13 @@ ST_tW_antitop_5f_inclusiveDecays:
   remoteBase: philip_v2
   sampleType: mc
   timestamps:
-  - '221221_164044'
-  - '230113_080621'
-  - '230124_150603'
+  - '230504_105655'
 ST_tW_top_5f_inclusiveDecays:
   miniAOD: /ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: philip_v2
   sampleType: mc
   timestamps:
-  - '230202_182227'
-  - '230214_152310'
+  - '230504_105636'
 SingleElectron_Run2017B-UL:
   miniAOD: /SingleElectron/Run2017B-UL2017_MiniAODv2-v1/MINIAOD
   remoteBase: bogdan_v2
@@ -561,10 +555,9 @@ TTToHadronic:
   remoteBase: philip_v2
   sampleType: mc
   timestamps:
-  - '221221_163901'
-  - '230119_172501'
-  - '230125_140626'
-  - '230331_195640'
+  - '230331_201724'
+  - '230417_113417'
+  - '230420_084501'
 TTToSemiLeptonic:
   miniAOD: /TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
@@ -608,10 +601,7 @@ TTZToLLNuNu:
   remoteBase: philip_v2
   sampleType: mc
   timestamps:
-  - []
-  - '230113_123455'
-  - '230123_081437'
-  - '230331_195640'
+  - '230331_201453'
 TTZZ:
   miniAOD: /TTZZ_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
@@ -1027,10 +1017,7 @@ WJetsToLNu_HT-800To1200:
   remoteBase: philip_v2
   sampleType: mc
   timestamps:
-  - '221221_164453'
-  - '230117_081938'
-  - '230124_075440'
-  - '230331_195640'
+  - '230331_201531'
 WW:
   miniAOD: /WW_TuneCP5_13TeV-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
@@ -1116,10 +1103,8 @@ ZZZ:
   remoteBase: philip_v2
   sampleType: mc
   timestamps:
-  - '221221_164541'
-  - '230117_082003'
-  - '230124_075504'
-  - '230331_195640'
+  - '230331_201512'
+  - '230410_123335'
 ggZH_HToBB_ZToLL:
   miniAOD: /ggZH_HToBB_ZToLL_M-125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
