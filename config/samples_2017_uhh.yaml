@@ -1,3 +1,9 @@
+GLOBAL:
+  era: Run2_2017
+  nanoVersion: v11
+  remoteBases:
+    bogdan_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/bwieders/crab_nano_v11_v2
+    philip_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/pkeicher/crab_nano_v11_v2
 DYJetsToLL_0J_amcatnloFXFX:
   miniAOD: /DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: philip_v2
@@ -33,9 +39,6 @@ DYJetsToLL_LHEFilterPtZ-100To250:
   remoteBase: philip_v2
   sampleType: mc
   timestamps:
-  - '230130_142724'
-  - '230206_085004'
-  - '230213_111054'
   - '230331_211449'
 DYJetsToLL_LHEFilterPtZ-250To400:
   miniAOD: /DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
@@ -95,12 +98,6 @@ EWKZ2Jets_ZToLL_M-50:
   - '221221_163811'
   - '230119_172405'
   - '230124_150409'
-GLOBAL:
-  era: Run2_2017
-  nanoVersion: v11
-  remoteBases:
-    bogdan_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/bwieders/crab_nano_v11_v2
-    philip_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/pkeicher/crab_nano_v11_v2
 GluGluHToTauTau:
   miniAOD: /GluGluHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v3/MINIAODSIM
   remoteBase: philip_v2
@@ -581,7 +578,7 @@ TTWJetsToQQ:
   timestamps:
   - '230321_093550'
   - '230331_071232'
-  - '230331_212746'
+  - '230331_212211'
 TTWW:
   miniAOD: /TTWW_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
   remoteBase: philip_v2
@@ -1123,7 +1120,10 @@ ttHToTauTau:
   miniAOD: /ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v3/MINIAODSIM
   remoteBase: philip_v2
   sampleType: mc
-  timestamps: []
+  timestamps:
+  - '230202_182413'
+  - '230321_093659'
+  - '230331_071254'
 ttHTobb:
   miniAOD: /ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: philip_v2
