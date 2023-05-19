@@ -39,7 +39,7 @@ DYJetsToLL_LHEFilterPtZ-100To250:
   remoteBase: philip_v2
   sampleType: mc
   timestamps:
-  - '230331_211449'
+  - '230331_201647'
 DYJetsToLL_LHEFilterPtZ-250To400:
   miniAOD: /DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM
   remoteBase: philip_v2
@@ -1121,7 +1121,6 @@ ttHToTauTau:
   remoteBase: philip_v2
   sampleType: mc
   timestamps:
-  - '230202_182413'
   - '230321_093659'
   - '230331_071254'
 ttHTobb:
