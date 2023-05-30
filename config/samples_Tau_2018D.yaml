@@ -1,9 +1,0 @@
-GLOBAL:
-  era: 'Run2_2018'
-
-Tau_2018D:
-  nanoAOD: /Tau/Run2018D-UL2018_MiniAODv2_NanoAODv9-v2/NANOAOD
-  miniAOD: /Tau/Run2018D-UL2018_MiniAODv2-v1/MINIAOD
-  sampleType: data
-  miniAOD_ignoreFiles:
-    - /store/data/Run2018D/Tau/MINIAOD/UL2018_MiniAODv2-v1/240000/85725A5B-F5E3-7A44-BDBD-7812E48A9733.root
