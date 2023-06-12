@@ -1,0 +1,15 @@
+GLOBAL:
+  era: Run2_2018
+  nanoVersion: v11
+  remoteBases:
+    bogdan_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/bwieders/crab_nano_v11_2018_v2
+    philip_v2: gsiftp://dcache-door-cms04.desy.de//pnfs/desy.de/cms/tier2/store/user/pkeicher/crab_nano_v11_2018_v2
+
+TTTo2L2Nu:
+  miniAOD: /TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM
+  sampleType: mc
+  remoteBase: bogdan_v2
+  timestamps:
+    - "230317_135817"
+    - "230327_090008"
+    - "230424_144233"
